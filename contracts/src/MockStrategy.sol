@@ -1,109 +1,39 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.20;
 
 import "./StrategyBase.sol";
 
 /**
  * @title MockStrategy
- * @notice Mock strategy for testing purposes
- * @dev Simulates a yield strategy with configurable yield rate
+ * @notice Mock strategy contract for testing purposes
+ * @dev Simulates a yield strategy by tracking deposits and withdrawals
  */
 contract MockStrategy is StrategyBase {
-    /// @notice Annual yield rate in basis points (e.g., 500 = 5%)
-    uint256 public yieldRate;
+    /// @notice Total amount deposited in the strategy
+    uint256 public totalDeposited;
 
-    /// @notice Last harvest timestamp
-    uint256 public lastHarvest;
-
-    /// @notice Time period for yield calculation (default: 1 year = 365 days)
-    uint256 public constant YIELD_PERIOD = 365 days;
-
-    /// @notice Events
-    event YieldRateUpdated(uint256 newRate);
-
-    constructor(
-        address _asset,
-        string memory _name,
-        uint256 _yieldRate,
-        address _owner
-    ) StrategyBase(_asset, _name, _owner) {
-        yieldRate = _yieldRate;
-        lastHarvest = block.timestamp;
+    /**
+     * @notice Deposit assets into the strategy
+     * @param amount Amount of assets to deposit
+     */
+    function deposit(uint256 amount) external override {
+        totalDeposited += amount;
     }
 
     /**
-     * @notice Set the yield rate
-     * @param _yieldRate New yield rate in basis points
+     * @notice Withdraw assets from the strategy
+     * @param amount Amount of assets to withdraw
      */
-    function setYieldRate(uint256 _yieldRate) external onlyOwner {
-        require(_yieldRate <= 10000, "MockStrategy: yield rate too high");
-        yieldRate = _yieldRate;
-        emit YieldRateUpdated(_yieldRate);
+    function withdraw(uint256 amount) external override {
+        require(totalDeposited >= amount, "MockStrategy: insufficient balance");
+        totalDeposited -= amount;
     }
 
     /**
-     * @notice Internal deposit function - just holds assets
-     * @param amount Amount deposited
+     * @notice Get the total assets in the strategy
+     * @return Total assets deposited in the strategy
      */
-    function _deposit(uint256 amount) internal override {
-        // Mock strategy just holds the assets
-        // In a real strategy, this would deploy assets to a yield protocol
-    }
-
-    /**
-     * @notice Internal withdraw function - returns assets
-     * @param amount Amount to withdraw
-     */
-    function _withdraw(uint256 amount) internal override {
-        // Mock strategy just returns the assets
-        // In a real strategy, this would withdraw from a yield protocol
-    }
-
-    /**
-     * @notice Internal harvest function - calculates and mints yield
-     * @return yield Amount of yield generated
-     */
-    function _harvest() internal override returns (uint256 yield) {
-        if (totalAssets == 0 || yieldRate == 0) {
-            return 0;
-        }
-
-        uint256 timeElapsed = block.timestamp - lastHarvest;
-        if (timeElapsed == 0) {
-            return 0;
-        }
-
-        // Calculate yield: (totalAssets * yieldRate * timeElapsed) / (YIELD_PERIOD * 10000)
-        yield = (totalAssets * yieldRate * timeElapsed) / (YIELD_PERIOD * 10000);
-        
-        if (yield > 0) {
-            // In a real scenario, yield would come from the protocol
-            // For mock, we simulate by minting or transferring from a mock yield source
-            // For now, we just update the timestamp
-            lastHarvest = block.timestamp;
-        }
-
-        return yield;
-    }
-
-    /**
-     * @notice Get current value including accrued yield
-     * @return value Current value of assets plus accrued yield
-     */
-    function _getValue() internal view override returns (uint256 value) {
-        if (totalAssets == 0 || yieldRate == 0) {
-            return totalAssets;
-        }
-
-        uint256 timeElapsed = block.timestamp - lastHarvest;
-        if (timeElapsed == 0) {
-            return totalAssets;
-        }
-
-        // Calculate accrued yield
-        uint256 accruedYield = (totalAssets * yieldRate * timeElapsed) / (YIELD_PERIOD * 10000);
-        value = totalAssets + accruedYield;
-
-        return value;
+    function totalAssets() external view override returns (uint256) {
+        return totalDeposited;
     }
 }
