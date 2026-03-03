@@ -14,8 +14,8 @@ contract StrategyManager is Ownable, ReentrancyGuard {
     /// @notice Array of registered strategies
     address[] public strategies;
 
-    /// @notice Mapping of strategy address to allocation details
-    mapping(address => StrategyAllocation) public allocations;
+    /// @notice Mapping of strategy address to strategy information
+    mapping(address => Strategy) public strategyInfo;
 
     /// @notice Mapping to check if a strategy is registered
     mapping(address => bool) public isStrategy;
@@ -23,11 +23,13 @@ contract StrategyManager is Ownable, ReentrancyGuard {
     /// @notice Maximum number of strategies allowed
     uint256 public maxStrategies = 10;
 
-    /// @notice Struct to store strategy allocation information
-    struct StrategyAllocation {
-        uint256 allocatedAmount;
-        uint256 targetAllocation; // Percentage (basis points, e.g., 5000 = 50%)
-        bool active;
+    /// @notice Struct to store strategy information
+    struct Strategy {
+        address strategy;      // Strategy contract address
+        uint256 apy;           // Annual Percentage Yield in basis points (e.g., 500 = 5%)
+        bool active;           // Whether the strategy is active
+        uint256 allocatedAmount; // Amount currently allocated to this strategy
+        uint256 targetAllocation; // Target allocation percentage (basis points, e.g., 5000 = 50%)
     }
 
     /// @notice Events
@@ -50,7 +52,9 @@ contract StrategyManager is Ownable, ReentrancyGuard {
 
         strategies.push(strategy);
         isStrategy[strategy] = true;
-        allocations[strategy].active = true;
+        strategyInfo[strategy].strategy = strategy;
+        strategyInfo[strategy].active = true;
+        strategyInfo[strategy].allocatedAmount = 0;
 
         emit StrategyRegistered(strategy);
     }
@@ -61,7 +65,7 @@ contract StrategyManager is Ownable, ReentrancyGuard {
      */
     function unregisterStrategy(address strategy) external onlyOwner {
         require(isStrategy[strategy], "StrategyManager: strategy not registered");
-        require(allocations[strategy].allocatedAmount == 0, "StrategyManager: strategy has allocated funds");
+        require(strategyInfo[strategy].allocatedAmount == 0, "StrategyManager: strategy has allocated funds");
 
         // Remove from strategies array
         for (uint256 i = 0; i < strategies.length; i++) {
@@ -73,7 +77,7 @@ contract StrategyManager is Ownable, ReentrancyGuard {
         }
 
         isStrategy[strategy] = false;
-        allocations[strategy].active = false;
+        strategyInfo[strategy].active = false;
 
         emit StrategyUnregistered(strategy);
     }
@@ -85,10 +89,10 @@ contract StrategyManager is Ownable, ReentrancyGuard {
      */
     function allocateToStrategy(address strategy, uint256 amount) external nonReentrant {
         require(isStrategy[strategy], "StrategyManager: strategy not registered");
-        require(allocations[strategy].active, "StrategyManager: strategy not active");
+        require(strategyInfo[strategy].active, "StrategyManager: strategy not active");
 
         StrategyBase(strategy).deposit(amount);
-        allocations[strategy].allocatedAmount += amount;
+        strategyInfo[strategy].allocatedAmount += amount;
 
         emit StrategyAllocated(strategy, amount);
     }
@@ -100,12 +104,24 @@ contract StrategyManager is Ownable, ReentrancyGuard {
      */
     function deallocateFromStrategy(address strategy, uint256 amount) external nonReentrant {
         require(isStrategy[strategy], "StrategyManager: strategy not registered");
-        require(allocations[strategy].allocatedAmount >= amount, "StrategyManager: insufficient allocation");
+        require(strategyInfo[strategy].allocatedAmount >= amount, "StrategyManager: insufficient allocation");
 
         StrategyBase(strategy).withdraw(amount);
-        allocations[strategy].allocatedAmount -= amount;
+        strategyInfo[strategy].allocatedAmount -= amount;
 
         emit StrategyDeallocated(strategy, amount);
+    }
+
+    /**
+     * @notice Set APY for a strategy
+     * @param strategy Address of the strategy
+     * @param apy APY in basis points (e.g., 500 = 5%)
+     */
+    function setStrategyAPY(address strategy, uint256 apy) external onlyOwner {
+        require(isStrategy[strategy], "StrategyManager: strategy not registered");
+        require(apy <= 10000, "StrategyManager: invalid APY (max 100%)");
+
+        strategyInfo[strategy].apy = apy;
     }
 
     /**
@@ -117,7 +133,7 @@ contract StrategyManager is Ownable, ReentrancyGuard {
         require(isStrategy[strategy], "StrategyManager: strategy not registered");
         require(targetAllocation <= 10000, "StrategyManager: invalid allocation percentage");
 
-        allocations[strategy].targetAllocation = targetAllocation;
+        strategyInfo[strategy].targetAllocation = targetAllocation;
     }
 
     /**
@@ -126,8 +142,18 @@ contract StrategyManager is Ownable, ReentrancyGuard {
      */
     function getTotalAllocated() external view returns (uint256 total) {
         for (uint256 i = 0; i < strategies.length; i++) {
-            total += allocations[strategies[i]].allocatedAmount;
+            total += strategyInfo[strategies[i]].allocatedAmount;
         }
+    }
+
+    /**
+     * @notice Get strategy information
+     * @param strategy Address of the strategy
+     * @return Strategy struct with all strategy information
+     */
+    function getStrategy(address strategy) external view returns (Strategy memory) {
+        require(isStrategy[strategy], "StrategyManager: strategy not registered");
+        return strategyInfo[strategy];
     }
 
     /**

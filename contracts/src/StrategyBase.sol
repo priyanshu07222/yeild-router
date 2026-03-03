@@ -75,8 +75,9 @@ abstract contract StrategyBase is Ownable, ReentrancyGuard {
     }
 
     /**
-     * @notice Get the current value of assets in the strategy
-     * @return value Current value of assets
+     * @notice Get the current value of assets in the strategy (including yield)
+     * @dev totalAssets() getter is automatically available via public state variable
+     * @return value Current value of assets including accrued yield
      */
     function getValue() external view virtual returns (uint256) {
         return _getValue();

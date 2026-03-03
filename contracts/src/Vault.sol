@@ -25,10 +25,16 @@ contract Vault is Ownable, ReentrancyGuard {
     uint256 public totalAssets;
 
     /// @notice Mapping of user addresses to their share balances
-    mapping(address => uint256) public shares;
+    mapping(address => uint256) public userShares;
 
     /// @notice Total shares issued
     uint256 public totalShares;
+
+    /// @notice Mapping of strategy addresses to their allocated amounts
+    mapping(address => uint256) public strategyAllocations;
+
+    /// @notice Array of strategies that currently have allocations
+    address[] public currentStrategies;
 
     /// @notice Events
     event Deposit(address indexed user, uint256 assets, uint256 shares);
@@ -42,6 +48,32 @@ contract Vault is Ownable, ReentrancyGuard {
     }
 
     /**
+     * @notice Get current total assets including yield from strategies
+     * @return Current total assets value
+     */
+    function getTotalAssets() public view returns (uint256) {
+        uint256 totalStrategyValue = 0;
+        
+        // Calculate total value from all strategies
+        for (uint256 i = 0; i < currentStrategies.length; i++) {
+            address strategy = currentStrategies[i];
+            StrategyBase strategyContract = StrategyBase(strategy);
+            totalStrategyValue += strategyContract.getValue();
+        }
+        
+        // Return vault balance + strategy values
+        return asset.balanceOf(address(this)) + totalStrategyValue;
+    }
+
+    /**
+     * @notice Sync totalAssets with current strategy values (including yield)
+     * @dev Should be called periodically to update totalAssets with accrued yield
+     */
+    function syncTotalAssets() public {
+        totalAssets = getTotalAssets();
+    }
+
+    /**
      * @notice Deposit assets into the vault
      * @param amount Amount of assets to deposit
      * @return sharesMinted Amount of shares minted
@@ -52,7 +84,7 @@ contract Vault is Ownable, ReentrancyGuard {
         asset.safeTransferFrom(msg.sender, address(this), amount);
         
         sharesMinted = convertToShares(amount);
-        shares[msg.sender] += sharesMinted;
+        userShares[msg.sender] += sharesMinted;
         totalShares += sharesMinted;
         totalAssets += amount;
 
@@ -67,12 +99,15 @@ contract Vault is Ownable, ReentrancyGuard {
      */
     function withdraw(uint256 sharesToBurn) external nonReentrant returns (uint256 assetsWithdrawn) {
         require(sharesToBurn > 0, "Vault: shares must be greater than 0");
-        require(shares[msg.sender] >= sharesToBurn, "Vault: insufficient shares");
+        require(userShares[msg.sender] >= sharesToBurn, "Vault: insufficient shares");
 
+        // Sync totalAssets with current strategy values before withdrawal
+        syncTotalAssets();
+        
         assetsWithdrawn = convertToAssets(sharesToBurn);
         require(totalAssets >= assetsWithdrawn, "Vault: insufficient assets");
 
-        shares[msg.sender] -= sharesToBurn;
+        userShares[msg.sender] -= sharesToBurn;
         totalShares -= sharesToBurn;
         totalAssets -= assetsWithdrawn;
 
@@ -99,7 +134,8 @@ contract Vault is Ownable, ReentrancyGuard {
      */
     function convertToAssets(uint256 sharesAmount) public view returns (uint256) {
         if (totalShares == 0) return 0;
-        return (sharesAmount * totalAssets) / totalShares;
+        uint256 currentTotalAssets = getTotalAssets();
+        return (sharesAmount * currentTotalAssets) / totalShares;
     }
 
     /**
@@ -120,6 +156,12 @@ contract Vault is Ownable, ReentrancyGuard {
         
         strategyManager.allocateToStrategy(strategy, amount);
         totalAssets -= amount;
+        
+        // Track strategy allocation
+        if (strategyAllocations[strategy] == 0) {
+            currentStrategies.push(strategy);
+        }
+        strategyAllocations[strategy] += amount;
 
         emit StrategyAllocated(strategy, amount);
     }
@@ -130,9 +172,32 @@ contract Vault is Ownable, ReentrancyGuard {
      * @param amount Amount to deallocate
      */
     function deallocateFromStrategy(address strategy, uint256 amount) external onlyOwner {
+        require(strategyAllocations[strategy] >= amount, "Vault: insufficient strategy allocation");
+        
         strategyManager.deallocateFromStrategy(strategy, amount);
         totalAssets += amount;
+        
+        // Update strategy allocation tracking
+        strategyAllocations[strategy] -= amount;
+        if (strategyAllocations[strategy] == 0) {
+            // Remove strategy from currentStrategies array
+            for (uint256 i = 0; i < currentStrategies.length; i++) {
+                if (currentStrategies[i] == strategy) {
+                    currentStrategies[i] = currentStrategies[currentStrategies.length - 1];
+                    currentStrategies.pop();
+                    break;
+                }
+            }
+        }
 
         emit StrategyDeallocated(strategy, amount);
+    }
+
+    /**
+     * @notice Get all current strategies with allocations
+     * @return Array of strategy addresses
+     */
+    function getCurrentStrategies() external view returns (address[] memory) {
+        return currentStrategies;
     }
 }
