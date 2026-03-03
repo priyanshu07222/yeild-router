@@ -1,0 +1,54 @@
+---
+alwaysApply: true
+description: Contract implementation order for cross-chain yield router
+---
+
+# Contract Implementation Order
+
+## Critical Rule: Sequential Contract Development
+
+**NEVER generate all contracts together. Always build contracts one at a time in the exact order specified below.**
+
+## Required Implementation Order
+
+Contracts must be implemented in this strict sequence:
+
+1. **StrategyBase** - Abstract base contract defining the strategy interface
+2. **MockStrategy** - Mock implementation for testing (depends on StrategyBase)
+3. **StrategyManager** - Manages multiple strategies (depends on StrategyBase)
+4. **Vault** - Main vault contract (depends on StrategyManager and StrategyBase)
+
+## Implementation Guidelines
+
+- **One contract per prompt**: Each contract should be implemented in a separate request/prompt
+- **Wait for completion**: Complete and verify each contract before moving to the next
+- **Dependencies first**: Always implement dependencies before dependents
+- **Test incrementally**: Test each contract as it's implemented
+
+## Contract Dependencies
+
+```
+StrategyBase (no dependencies)
+    ↓
+MockStrategy (depends on StrategyBase)
+    ↓
+StrategyManager (depends on StrategyBase)
+    ↓
+Vault (depends on StrategyManager and StrategyBase)
+```
+
+## When User Requests Multiple Contracts
+
+If the user requests multiple contracts or "all contracts":
+1. **Stop and remind** them of the sequential order
+2. **Ask which contract** they want to implement first
+3. **Only implement** the requested contract
+4. **Wait for next prompt** before implementing the next contract
+
+## File Locations
+
+- Contracts are located in: `contracts/src/`
+- Base contract: [StrategyBase.sol](mdc:contracts/src/StrategyBase.sol)
+- Mock strategy: [MockStrategy.sol](mdc:contracts/src/MockStrategy.sol)
+- Strategy manager: [StrategyManager.sol](mdc:contracts/src/StrategyManager.sol)
+- Vault: [Vault.sol](mdc:contracts/src/Vault.sol)
