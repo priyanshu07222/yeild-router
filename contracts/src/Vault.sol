@@ -63,7 +63,7 @@ contract Vault is Ownable, ReentrancyGuard {
         // Transfer assets from user
         asset.safeTransferFrom(msg.sender, address(this), amount);
 
-        // Sync totalAssets with current strategy value
+        // Sync totalAssets with current strategy value BEFORE calculating shares
         _syncTotalAssets();
 
         // Calculate shares to mint
@@ -76,15 +76,17 @@ contract Vault is Ownable, ReentrancyGuard {
             shares = (amount * totalShares) / totalAssets;
         }
 
-        // Update state
-        totalAssets += amount;
+        // Update state BEFORE allocation
         totalShares += shares;
         userShares[msg.sender] += shares;
 
-        emit Deposit(msg.sender, amount, shares);
-
-        // Allocate funds to best strategy
+        // Allocate funds to best strategy (this moves funds to strategy)
         _allocateToBestStrategy();
+
+        // Sync totalAssets AFTER allocation to include the new funds
+        _syncTotalAssets();
+
+        emit Deposit(msg.sender, amount, shares);
     }
 
     /**
@@ -99,22 +101,37 @@ contract Vault is Ownable, ReentrancyGuard {
         // Sync totalAssets with current strategy value
         _syncTotalAssets();
 
-        // Calculate proportional assets
+        // Get actual available assets (vault balance + strategy actual balance)
+        uint256 vaultBalance = asset.balanceOf(address(this));
+        uint256 strategyActualBalance = 0;
+        if (currentStrategy != address(0)) {
+            strategyActualBalance = asset.balanceOf(currentStrategy);
+        }
+        uint256 totalAvailableAssets = vaultBalance + strategyActualBalance;
+        
+        // Calculate proportional assets based on totalAssets (includes yield)
+        // But cap to actual available assets (can't withdraw simulated yield)
         uint256 assets = (shares * totalAssets) / totalShares;
         require(assets > 0, "Vault: calculated assets is zero");
+        
+        // Cap assets to what's actually available (can't withdraw simulated yield)
+        if (assets > totalAvailableAssets) {
+            assets = totalAvailableAssets;
+        }
 
-        // Withdraw from strategy if funds are allocated
-        if (currentStrategy != address(0) && totalAssets > 0) {
-            uint256 vaultBalance = asset.balanceOf(address(this));
-            uint256 strategyBalance = asset.balanceOf(currentStrategy);
+        // Withdraw from strategy if needed
+        if (currentStrategy != address(0) && vaultBalance < assets) {
+            uint256 neededFromStrategy = assets - vaultBalance;
             
-            // Withdraw from strategy if needed (only if vault doesn't have enough)
-            if (vaultBalance < assets && strategyBalance > 0) {
-                uint256 neededFromStrategy = assets - vaultBalance;
-                uint256 withdrawAmount = neededFromStrategy > strategyBalance ? strategyBalance : neededFromStrategy;
-                if (withdrawAmount > 0) {
-                    StrategyBase(currentStrategy).withdraw(withdrawAmount);
-                }
+            // Don't withdraw more than strategy actually has
+            if (neededFromStrategy > strategyActualBalance) {
+                neededFromStrategy = strategyActualBalance;
+                // Recalculate assets based on what we can actually withdraw
+                assets = vaultBalance + neededFromStrategy;
+            }
+            
+            if (neededFromStrategy > 0) {
+                StrategyBase(currentStrategy).withdraw(neededFromStrategy);
             }
         }
 
@@ -150,9 +167,10 @@ contract Vault is Ownable, ReentrancyGuard {
 
         // Withdraw all funds from old strategy if exists
         if (oldStrategy != address(0)) {
-            uint256 oldStrategyAssets = StrategyBase(oldStrategy).totalAssets();
-            if (oldStrategyAssets > 0) {
-                StrategyBase(oldStrategy).withdraw(oldStrategyAssets);
+            // Get the actual balance in the strategy (what we can withdraw)
+            uint256 strategyBalance = asset.balanceOf(oldStrategy);
+            if (strategyBalance > 0) {
+                StrategyBase(oldStrategy).withdraw(strategyBalance);
             }
         }
 
@@ -169,8 +187,11 @@ contract Vault is Ownable, ReentrancyGuard {
             }
             asset.safeIncreaseAllowance(bestStrategy, vaultBalance);
             StrategyBase(bestStrategy).deposit(vaultBalance);
-            // Reset approval
-            asset.safeDecreaseAllowance(bestStrategy, vaultBalance);
+            // Reset approval - check current allowance first
+            uint256 remainingAllowance = asset.allowance(address(this), bestStrategy);
+            if (remainingAllowance > 0) {
+                asset.safeDecreaseAllowance(bestStrategy, remainingAllowance);
+            }
         }
 
         emit Rebalance(oldStrategy, bestStrategy);
@@ -202,39 +223,32 @@ contract Vault is Ownable, ReentrancyGuard {
                 return; // No strategies available
             }
 
-            // If no current strategy or best strategy changed, rebalance
-            if (currentStrategy == address(0) || bestStrategy != currentStrategy) {
-            // For deposits, we'll allocate new funds to best strategy
+            // Determine which strategy to allocate to
+            // If no current strategy, use best strategy
+            // Otherwise, allocate to current strategy (rebalance happens explicitly)
+            address targetStrategy = currentStrategy == address(0) ? bestStrategy : currentStrategy;
+
+            // Allocate funds to target strategy
             uint256 vaultBalance = asset.balanceOf(address(this));
-            if (vaultBalance > 0 && bestStrategy != address(0)) {
+            if (vaultBalance > 0 && targetStrategy != address(0)) {
                 // Reset approval to 0 first, then set to amount
-                uint256 currentAllowance = asset.allowance(address(this), bestStrategy);
+                uint256 currentAllowance = asset.allowance(address(this), targetStrategy);
                 if (currentAllowance > 0) {
-                    asset.safeDecreaseAllowance(bestStrategy, currentAllowance);
+                    asset.safeDecreaseAllowance(targetStrategy, currentAllowance);
                 }
-                asset.safeIncreaseAllowance(bestStrategy, vaultBalance);
-                StrategyBase(bestStrategy).deposit(vaultBalance);
-                // Reset approval
-                asset.safeDecreaseAllowance(bestStrategy, vaultBalance);
+                asset.safeIncreaseAllowance(targetStrategy, vaultBalance);
+                StrategyBase(targetStrategy).deposit(vaultBalance);
+                // Reset approval - check current allowance first
+                uint256 remainingAllowance = asset.allowance(address(this), targetStrategy);
+                if (remainingAllowance > 0) {
+                    asset.safeDecreaseAllowance(targetStrategy, remainingAllowance);
+                }
                 
-                // Update current strategy if it changed
-                if (currentStrategy != bestStrategy) {
+                // Update current strategy if it was unset
+                if (currentStrategy == address(0)) {
                     currentStrategy = bestStrategy;
                 }
             }
-        } else {
-            // Same strategy, just deposit new funds
-            uint256 vaultBalance = asset.balanceOf(address(this));
-            if (vaultBalance > 0) {
-                uint256 currentAllowance = asset.allowance(address(this), bestStrategy);
-                if (currentAllowance > 0) {
-                    asset.safeDecreaseAllowance(bestStrategy, currentAllowance);
-                }
-                asset.safeIncreaseAllowance(bestStrategy, vaultBalance);
-                StrategyBase(bestStrategy).deposit(vaultBalance);
-                asset.safeDecreaseAllowance(bestStrategy, vaultBalance);
-            }
-        }
         } catch {
             // If getBestStrategy fails (no strategies), funds stay in vault
             return;
