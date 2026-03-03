@@ -3,14 +3,17 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "./StrategyManager.sol";
+import "./StrategyBase.sol";
 
 /**
  * @title Vault
- * @notice Vault contract that accepts deposits and manages shares
- * @dev Users deposit assets and receive shares proportional to their deposit
+ * @notice DeFi Yield Router Vault that allocates funds to the best strategy
+ * @dev Users deposit ERC20 tokens and receive shares. Funds are allocated to highest APY strategy.
  */
-contract Vault {
+contract Vault is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     /// @notice The underlying asset token (e.g., USDC, USDT)
@@ -22,13 +25,30 @@ contract Vault {
     /// @notice Total shares issued
     uint256 public totalShares;
 
-    /// @notice Total assets in the vault
+    /// @notice Total assets in the vault (including yield from strategies)
     uint256 public totalAssets;
 
     /// @notice Mapping of user addresses to their share balances
     mapping(address => uint256) public userShares;
 
-    constructor(address _asset, address _strategyManager) {
+    /// @notice Current strategy where funds are allocated
+    address public currentStrategy;
+
+    /// @notice Events
+    event Deposit(address indexed user, uint256 amount, uint256 shares);
+    event Withdraw(address indexed user, uint256 amount, uint256 shares);
+    event Rebalance(address indexed oldStrategy, address indexed newStrategy);
+
+    /**
+     * @notice Constructor
+     * @param _asset Address of the ERC20 asset token
+     * @param _strategyManager Address of the StrategyManager contract
+     * @param _owner Address of the contract owner
+     */
+    constructor(address _asset, address _strategyManager, address _owner) Ownable(_owner) {
+        require(_asset != address(0), "Vault: invalid asset address");
+        require(_strategyManager != address(0), "Vault: invalid strategy manager address");
+        
         asset = IERC20(_asset);
         strategyManager = StrategyManager(_strategyManager);
     }
@@ -37,11 +57,14 @@ contract Vault {
      * @notice Deposit assets into the vault
      * @param amount Amount of assets to deposit
      */
-    function deposit(uint256 amount) external {
+    function deposit(uint256 amount) external nonReentrant {
         require(amount > 0, "Vault: amount must be greater than 0");
 
         // Transfer assets from user
         asset.safeTransferFrom(msg.sender, address(this), amount);
+
+        // Sync totalAssets with current strategy value
+        _syncTotalAssets();
 
         // Calculate shares to mint
         uint256 shares;
@@ -53,34 +76,168 @@ contract Vault {
             shares = (amount * totalShares) / totalAssets;
         }
 
-        // Increase total assets
+        // Update state
         totalAssets += amount;
-
-        // Mint shares
         totalShares += shares;
         userShares[msg.sender] += shares;
+
+        emit Deposit(msg.sender, amount, shares);
+
+        // Allocate funds to best strategy
+        _allocateToBestStrategy();
     }
 
     /**
      * @notice Withdraw assets from the vault
      * @param shares Amount of shares to burn
      */
-    function withdraw(uint256 shares) external {
+    function withdraw(uint256 shares) external nonReentrant {
         require(shares > 0, "Vault: shares must be greater than 0");
         require(userShares[msg.sender] >= shares, "Vault: insufficient shares");
         require(totalShares > 0, "Vault: no shares issued");
 
+        // Sync totalAssets with current strategy value
+        _syncTotalAssets();
+
         // Calculate proportional assets
         uint256 assets = (shares * totalAssets) / totalShares;
+        require(assets > 0, "Vault: calculated assets is zero");
 
-        // Burn shares
+        // Withdraw from strategy if funds are allocated
+        if (currentStrategy != address(0) && totalAssets > 0) {
+            uint256 vaultBalance = asset.balanceOf(address(this));
+            uint256 strategyBalance = asset.balanceOf(currentStrategy);
+            
+            // Withdraw from strategy if needed (only if vault doesn't have enough)
+            if (vaultBalance < assets && strategyBalance > 0) {
+                uint256 neededFromStrategy = assets - vaultBalance;
+                uint256 withdrawAmount = neededFromStrategy > strategyBalance ? strategyBalance : neededFromStrategy;
+                if (withdrawAmount > 0) {
+                    StrategyBase(currentStrategy).withdraw(withdrawAmount);
+                }
+            }
+        }
+
+        // Update state
         totalShares -= shares;
         userShares[msg.sender] -= shares;
-
-        // Decrease total assets
         totalAssets -= assets;
 
         // Transfer assets to user
         asset.safeTransfer(msg.sender, assets);
+
+        emit Withdraw(msg.sender, assets, shares);
+    }
+
+    /**
+     * @notice Rebalance funds to the best strategy
+     * @dev Only owner can call this function
+     */
+    function rebalance() external onlyOwner nonReentrant {
+        // Sync totalAssets with current strategy value
+        _syncTotalAssets();
+
+        // Get best strategy
+        address bestStrategy = strategyManager.getBestStrategy();
+        require(bestStrategy != address(0), "Vault: no best strategy found");
+
+        // If best strategy is same as current, do nothing
+        if (bestStrategy == currentStrategy) {
+            return;
+        }
+
+        address oldStrategy = currentStrategy;
+
+        // Withdraw all funds from old strategy if exists
+        if (oldStrategy != address(0)) {
+            uint256 oldStrategyAssets = StrategyBase(oldStrategy).totalAssets();
+            if (oldStrategyAssets > 0) {
+                StrategyBase(oldStrategy).withdraw(oldStrategyAssets);
+            }
+        }
+
+        // Update current strategy
+        currentStrategy = bestStrategy;
+
+        // Deposit all available funds into new strategy
+        uint256 vaultBalance = asset.balanceOf(address(this));
+        if (vaultBalance > 0) {
+            // Reset approval to 0 first, then set to amount
+            uint256 currentAllowance = asset.allowance(address(this), bestStrategy);
+            if (currentAllowance > 0) {
+                asset.safeDecreaseAllowance(bestStrategy, currentAllowance);
+            }
+            asset.safeIncreaseAllowance(bestStrategy, vaultBalance);
+            StrategyBase(bestStrategy).deposit(vaultBalance);
+            // Reset approval
+            asset.safeDecreaseAllowance(bestStrategy, vaultBalance);
+        }
+
+        emit Rebalance(oldStrategy, bestStrategy);
+    }
+
+    /**
+     * @notice Sync totalAssets with current strategy value
+     * @dev Internal function to update totalAssets based on strategy returns
+     */
+    function _syncTotalAssets() internal {
+        uint256 vaultBalance = asset.balanceOf(address(this));
+        uint256 strategyValue = 0;
+
+        if (currentStrategy != address(0)) {
+            strategyValue = StrategyBase(currentStrategy).totalAssets();
+        }
+
+        totalAssets = vaultBalance + strategyValue;
+    }
+
+    /**
+     * @notice Allocate funds to the best strategy
+     * @dev Internal function called after deposits
+     */
+    function _allocateToBestStrategy() internal {
+        // Get best strategy
+        try strategyManager.getBestStrategy() returns (address bestStrategy) {
+            if (bestStrategy == address(0)) {
+                return; // No strategies available
+            }
+
+            // If no current strategy or best strategy changed, rebalance
+            if (currentStrategy == address(0) || bestStrategy != currentStrategy) {
+            // For deposits, we'll allocate new funds to best strategy
+            uint256 vaultBalance = asset.balanceOf(address(this));
+            if (vaultBalance > 0 && bestStrategy != address(0)) {
+                // Reset approval to 0 first, then set to amount
+                uint256 currentAllowance = asset.allowance(address(this), bestStrategy);
+                if (currentAllowance > 0) {
+                    asset.safeDecreaseAllowance(bestStrategy, currentAllowance);
+                }
+                asset.safeIncreaseAllowance(bestStrategy, vaultBalance);
+                StrategyBase(bestStrategy).deposit(vaultBalance);
+                // Reset approval
+                asset.safeDecreaseAllowance(bestStrategy, vaultBalance);
+                
+                // Update current strategy if it changed
+                if (currentStrategy != bestStrategy) {
+                    currentStrategy = bestStrategy;
+                }
+            }
+        } else {
+            // Same strategy, just deposit new funds
+            uint256 vaultBalance = asset.balanceOf(address(this));
+            if (vaultBalance > 0) {
+                uint256 currentAllowance = asset.allowance(address(this), bestStrategy);
+                if (currentAllowance > 0) {
+                    asset.safeDecreaseAllowance(bestStrategy, currentAllowance);
+                }
+                asset.safeIncreaseAllowance(bestStrategy, vaultBalance);
+                StrategyBase(bestStrategy).deposit(vaultBalance);
+                asset.safeDecreaseAllowance(bestStrategy, vaultBalance);
+            }
+        }
+        } catch {
+            // If getBestStrategy fails (no strategies), funds stay in vault
+            return;
+        }
     }
 }

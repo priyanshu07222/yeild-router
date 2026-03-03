@@ -59,10 +59,10 @@ contract VaultTest is Test {
         asset = new MockERC20();
         
         // Deploy StrategyManager
-        strategyManager = new StrategyManager();
+        strategyManager = new StrategyManager(address(this));
         
         // Deploy Vault
-        vault = new Vault(address(asset), address(strategyManager));
+        vault = new Vault(address(asset), address(strategyManager), address(this));
 
         // Mint tokens to users
         asset.mint(user1, 10000e18);

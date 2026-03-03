@@ -14,26 +14,27 @@ contract DeployScript is Script {
     function run() public {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         address assetAddress = vm.envAddress("ASSET_ADDRESS");
+        address owner = vm.addr(deployerPrivateKey);
         
         vm.startBroadcast(deployerPrivateKey);
 
         console.log("Deploying contracts...");
-        console.log("Deployer:", msg.sender);
+        console.log("Deployer:", owner);
         console.log("Asset Address:", assetAddress);
 
         // Deploy StrategyManager
         console.log("\n1. Deploying StrategyManager...");
-        strategyManager = new StrategyManager();
+        strategyManager = new StrategyManager(owner);
         console.log("StrategyManager deployed at:", address(strategyManager));
 
         // Deploy MockStrategy
         console.log("\n2. Deploying MockStrategy...");
-        mockStrategy = new MockStrategy();
+        mockStrategy = new MockStrategy(assetAddress);
         console.log("MockStrategy deployed at:", address(mockStrategy));
 
         // Deploy Vault
         console.log("\n3. Deploying Vault...");
-        vault = new Vault(assetAddress, address(strategyManager));
+        vault = new Vault(assetAddress, address(strategyManager), owner);
         console.log("Vault deployed at:", address(vault));
 
         // Optional: Add MockStrategy to StrategyManager with an APY
