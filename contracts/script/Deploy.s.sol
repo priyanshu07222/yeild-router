@@ -5,7 +5,6 @@ import {Script, console} from "forge-std/Script.sol";
 import {StrategyManager} from "../src/StrategyManager.sol";
 import {MockStrategy} from "../src/MockStrategy.sol";
 import {Vault} from "../src/Vault.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract DeployScript is Script {
     StrategyManager public strategyManager;
