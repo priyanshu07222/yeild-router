@@ -1,39 +1,30 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useReadContract, useWriteContract, useWaitForTransactionReceipt, useAccount } from "wagmi";
+import { useReadContract, useWriteContract, useWaitForTransactionReceipt, usePublicClient } from "wagmi";
 import vaultABI from "@/contracts/abi.json";
 import strategyManagerABI from "@/contracts/strategyManagerABI.json";
 
 const VAULT_ADDRESS = process.env.NEXT_PUBLIC_VAULT_ADDRESS || "0x0000000000000000000000000000000000000000";
 const STRATEGY_MANAGER_ADDRESS = process.env.NEXT_PUBLIC_STRATEGY_MANAGER_ADDRESS || "0x0000000000000000000000000000000000000000";
 
-interface Strategy {
-  name?: string;
-  apy: number;
-  active: boolean;
-  totalAssets?: bigint;
+export interface Strategy {
   address: string;
+  apy: number; // APY in basis points (e.g., 500 = 5%)
+  active: boolean;
 }
 
 export function useStrategies() {
-  const { address } = useAccount();
+  const publicClient = usePublicClient();
   const [strategies, setStrategies] = useState<Strategy[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Read strategy count
-  const { data: strategyCount } = useReadContract({
+  const { data: strategyCount, refetch: refetchCount } = useReadContract({
     address: STRATEGY_MANAGER_ADDRESS as `0x${string}`,
     abi: strategyManagerABI,
     functionName: "getStrategyCount",
-  });
-
-  // Read best strategy
-  const { data: bestStrategy } = useReadContract({
-    address: STRATEGY_MANAGER_ADDRESS as `0x${string}`,
-    abi: strategyManagerABI,
-    functionName: "getBestStrategy",
   });
 
   // Rebalance function
@@ -44,7 +35,7 @@ export function useStrategies() {
 
   useEffect(() => {
     const fetchStrategies = async () => {
-      if (!strategyCount) {
+      if (!strategyCount || !publicClient) {
         setIsLoading(false);
         return;
       }
@@ -54,20 +45,20 @@ export function useStrategies() {
         setError(null);
 
         const count = Number(strategyCount);
-        const strategyPromises = [];
+        const strategyPromises: Promise<Strategy>[] = [];
 
         for (let i = 0; i < count; i++) {
-          // Read strategy from StrategyManager contract
-          // Note: This would need to be implemented with useReadContract for each strategy
-          // For now, we'll create a structure that can be enhanced
           strategyPromises.push(
-            Promise.resolve({
-              name: `Strategy ${i + 1}`,
-              apy: 500 + i * 500, // This should be read from contract
-              active: true, // This should be read from contract
-              totalAssets: BigInt(0),
-              address: `0x${i.toString().padStart(40, "0")}`, // This should be read from contract
-            })
+            publicClient.readContract({
+              address: STRATEGY_MANAGER_ADDRESS as `0x${string}`,
+              abi: strategyManagerABI,
+              functionName: "getStrategy",
+              args: [BigInt(i)],
+            }).then((result: any) => ({
+              address: result.strategy as string,
+              apy: Number(result.apy),
+              active: result.active as boolean,
+            }))
           );
         }
 
@@ -75,19 +66,18 @@ export function useStrategies() {
         setStrategies(fetchedStrategies);
       } catch (err: any) {
         setError(err.message || "Failed to fetch strategies");
+        console.error("Error fetching strategies:", err);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchStrategies();
-  }, [strategyCount]);
+  }, [strategyCount, publicClient, rebalanceHash]);
 
   const rebalance = async () => {
     try {
       setError(null);
-      // Note: Rebalance is owner-only, so this will only work if the connected wallet is the owner
-      // Rebalance is called on the Vault contract, not StrategyManager
       await rebalanceContract({
         address: VAULT_ADDRESS as `0x${string}`,
         abi: vaultABI,
@@ -95,14 +85,17 @@ export function useStrategies() {
       });
     } catch (err: any) {
       setError(err.message || "Rebalance failed");
+      throw err;
     }
   };
 
   return {
     strategies,
-    bestStrategy: bestStrategy as string | undefined,
     rebalance,
     isLoading: isLoading || isRebalancePending || isRebalanceConfirming,
     error,
+    refetch: () => {
+      refetchCount();
+    },
   };
 }
