@@ -7,6 +7,13 @@ import vaultABI from "@/contracts/abi.json";
 
 const VAULT_ADDRESS = process.env.NEXT_PUBLIC_VAULT_ADDRESS || "0x0000000000000000000000000000000000000000";
 
+const toBigIntSafe = (value: unknown): bigint => {
+  if (typeof value === "bigint") return value;
+  if (typeof value === "number") return BigInt(value);
+  if (typeof value === "string") return BigInt(value);
+  throw new Error("Unexpected contract response type");
+};
+
 export function useVault() {
   const { address, isConnected } = useAccount();
   const publicClient = usePublicClient();
@@ -106,7 +113,7 @@ export function useVault() {
         functionName: "totalAssets",
       });
 
-      return BigInt(result.toString());
+      return toBigIntSafe(result);
     } catch (err: any) {
       setError(err.message || "Failed to get total assets");
       throw err;
@@ -132,7 +139,7 @@ export function useVault() {
         args: [address],
       });
 
-      return BigInt(result.toString());
+      return toBigIntSafe(result);
     } catch (err: any) {
       setError(err.message || "Failed to get user shares");
       throw err;
@@ -146,8 +153,8 @@ export function useVault() {
     withdraw,
     getTotalAssets,
     getUserShares,
-    totalAssets: totalAssets ? BigInt(totalAssets.toString()) : null,
-    userShares: userShares ? BigInt(userShares.toString()) : null,
+    totalAssets: totalAssets !== undefined ? toBigIntSafe(totalAssets) : null,
+    userShares: userShares !== undefined ? toBigIntSafe(userShares) : null,
     isLoading,
     error,
   };
