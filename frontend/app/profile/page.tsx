@@ -10,10 +10,10 @@ import YieldAnalytics from "@/components/YieldAnalytics";
 
 export default function ProfilePage() {
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen">
       <DashboardSidebar />
       
-      <main className="flex-1 p-4 sm:p-6 lg:p-8 md:ml-64">
+      <main className="p-4 sm:p-6 lg:p-8 md:ml-64">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Profile Header */}
           <ProfileHeader />

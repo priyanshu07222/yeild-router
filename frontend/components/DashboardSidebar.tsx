@@ -71,7 +71,7 @@ export default function DashboardSidebar() {
             animate={{ x: 0 }}
             exit={{ x: -300 }}
             transition={{ duration: 0.3 }}
-            className="fixed md:static top-0 left-0 h-screen w-64 glass-card border-r border-white/10 z-40 md:z-auto"
+            className="fixed top-0 left-0 h-screen w-64 glass-card border-r border-white/10 z-40"
           >
             <div className="p-6 h-full flex flex-col">
               <Link href="/" className="mb-8">

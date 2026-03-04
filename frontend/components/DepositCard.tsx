@@ -43,7 +43,7 @@ export default function DepositCard() {
   };
 
   return (
-    <div className="glass-card rounded-xl p-6 max-w-md mx-auto">
+    <div className="glass-card rounded-xl p-6 w-full">
       <h2 className="text-2xl font-semibold mb-6 text-white">Deposit to Vault</h2>
       
       {/* Wallet Connection Status */}
