@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
-import Navigation from "@/components/Navigation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DeFi Yield Router",
-  description: "Automatically route your funds to the highest yield strategies",
+  title: "Yield Router - Cross-Chain Yield Optimization on Polkadot",
+  description: "Automatically route your assets to the highest yield strategy across parachains",
 };
 
 export default function RootLayout({
@@ -30,7 +29,6 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          <Navigation />
           {children}
         </Providers>
       </body>
