@@ -38,13 +38,13 @@ export default function LandingNavbar() {
           <div className="hidden md:flex items-center space-x-8">
             <Link
               href="#features"
-              className="text-[#A8C1D9] hover:text-white transition-colors text-sm font-medium"
+              className="text-[#8795B3] hover:text-white transition-colors text-sm font-medium"
             >
               Docs
             </Link>
             <Link
               href="/deposit"
-              className="text-[#A8C1D9] hover:text-white transition-colors text-sm font-medium"
+              className="text-[#8795B3] hover:text-white transition-colors text-sm font-medium"
             >
               Dashboard
             </Link>
@@ -52,7 +52,7 @@ export default function LandingNavbar() {
               href="https://github.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#A8C1D9] hover:text-white transition-colors text-sm font-medium"
+              className="text-[#8795B3] hover:text-white transition-colors text-sm font-medium"
             >
               Github
             </a>
@@ -102,14 +102,14 @@ export default function LandingNavbar() {
           >
             <Link
               href="#features"
-              className="block text-[#A8C1D9] hover:text-white transition-colors"
+              className="block text-[#8795B3] hover:text-white transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Docs
             </Link>
             <Link
               href="/deposit"
-              className="block text-[#A8C1D9] hover:text-white transition-colors"
+              className="block text-[#8795B3] hover:text-white transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Dashboard
@@ -118,7 +118,7 @@ export default function LandingNavbar() {
               href="https://github.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="block text-[#A8C1D9] hover:text-white transition-colors"
+              className="block text-[#8795B3] hover:text-white transition-colors"
             >
               Github
             </a>

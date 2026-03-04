@@ -46,7 +46,7 @@ export default function DashboardPreview() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="glass-card rounded-2xl p-8 md:p-12"
+          className="glass-card rounded-2xl p-8 md:p-12 relative z-10"
         >
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">
             Dashboard Preview
@@ -62,13 +62,13 @@ export default function DashboardPreview() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="glass-card rounded-xl p-6 glass-card-hover"
               >
-                <p className="text-[#A8C1D9] text-sm mb-2">{stat.label}</p>
+                <p className="text-[#8795B3] text-sm mb-2">{stat.label}</p>
                 <p className="text-2xl md:text-3xl font-bold text-white mb-2">
                   {stat.value}
                 </p>
                 <p
                   className={`text-sm ${
-                    stat.positive ? "text-[#4DA6FF]" : "text-red-400"
+                    stat.positive ? "text-[#8795B3]" : "text-red-400"
                   }`}
                 >
                   {stat.change}

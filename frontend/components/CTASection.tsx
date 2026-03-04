@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function CTASection() {
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8">
+    <section className="py-20 px-4 sm:px-6 lg:px-8 relative z-10">
       <div className="container mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -29,7 +29,7 @@ export default function CTASection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg md:text-xl text-[#A8C1D9] mb-8 max-w-2xl mx-auto"
+            className="text-lg md:text-xl text-[#8795B3] mb-8 max-w-2xl mx-auto"
           >
             Join thousands of users earning maximum yield across the Polkadot ecosystem
           </motion.p>
@@ -42,7 +42,7 @@ export default function CTASection() {
           >
             <Link
               href="/deposit"
-              className="btn-glow inline-block px-10 py-5 bg-[#2B6EFF] hover:bg-[#4DA6FF] text-white font-semibold rounded-lg transition-all duration-300 text-lg md:text-xl"
+              className="btn-glow inline-block px-10 py-5 bg-[#8795B3] hover:bg-[#3A404D] text-white font-semibold rounded-lg transition-all duration-300 text-lg md:text-xl"
             >
               Launch App
             </Link>

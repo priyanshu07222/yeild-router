@@ -27,11 +27,11 @@ export default function WithdrawCard() {
       <div className="space-y-4">
         <div>
           <div className="flex justify-between items-center mb-2">
-            <label htmlFor="shares" className="block text-sm font-medium text-gray-300">
+            <label htmlFor="shares" className="block text-sm font-medium text-[#8795B3]">
               Shares
             </label>
             {userShares && (
-              <span className="text-sm text-gray-400">
+              <span className="text-sm text-[#8795B3]">
                 Available: {userShares.toString()}
               </span>
             )}
@@ -43,7 +43,7 @@ export default function WithdrawCard() {
               value={shares}
               onChange={(e) => setShares(e.target.value)}
               placeholder="0.00"
-              className="flex-1 px-4 py-2 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-gray-400 backdrop-blur-sm"
+              className="flex-1 px-4 py-2 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-[#8795B3] focus:border-[#8795B3] text-white placeholder-[#8795B3]/50 backdrop-blur-sm"
               step="0.01"
               min="0"
             />

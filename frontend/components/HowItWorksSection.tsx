@@ -25,7 +25,7 @@ const steps = [
 
 export default function HowItWorksSection() {
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent to-[#0C2A44]/50">
+    <section className="py-20 px-4 sm:px-6 lg:px-8 relative z-10">
       <div className="container mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -37,7 +37,7 @@ export default function HowItWorksSection() {
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             How It Works
           </h2>
-          <p className="text-lg text-[#A8C1D9] max-w-2xl mx-auto">
+          <p className="text-lg text-[#8795B3] max-w-2xl mx-auto">
             Simple three-step process to start earning maximum yield
           </p>
         </motion.div>
@@ -54,17 +54,17 @@ export default function HowItWorksSection() {
             >
               {/* Connector line */}
               {index < steps.length - 1 && (
-                <div className="hidden md:block absolute top-12 left-full w-full h-0.5 bg-gradient-to-r from-[#2B6EFF] to-transparent z-0" />
+                <div className="hidden md:block absolute top-12 left-full w-full h-0.5 bg-gradient-to-r from-[#8795B3] to-transparent z-0" />
               )}
               
               <div className="glass-card rounded-xl p-8 glass-card-hover relative z-10">
-                <div className="text-5xl font-bold text-[#2B6EFF] mb-4 opacity-50">
+                <div className="text-5xl font-bold text-[#8795B3] mb-4 opacity-50">
                   {step.number}
                 </div>
                 <h3 className="text-xl font-bold text-white mb-3">
                   {step.title}
                 </h3>
-                <p className="text-[#A8C1D9] leading-relaxed">
+                <p className="text-[#8795B3] leading-relaxed">
                   {step.description}
                 </p>
               </div>

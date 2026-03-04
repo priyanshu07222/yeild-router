@@ -1,12 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --background: #071B2E;
+  --background: #0F172B;
   --foreground: #FFFFFF;
-  --primary-accent: #2B6EFF;
-  --secondary-accent: #4DA6FF;
+  --primary-accent: #8795B3;
+  --secondary-accent: #3A404D;
   --text-primary: #FFFFFF;
-  --text-secondary: #A8C1D9;
+  --text-secondary: #8795B3;
+  --overlay: rgba(15, 23, 43, 0.33);
 }
 
 @theme inline {
@@ -17,19 +18,35 @@
 }
 
 body {
-  background: linear-gradient(135deg, #071B2E 0%, #0C2A44 50%, #122F49 100%);
+  background-image: url('/bg.png');
+  background-size: cover;
+  background-position: center;
   background-attachment: fixed;
+  background-repeat: no-repeat;
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   min-height: 100vh;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 43, 0.33);
+  z-index: -1;
+  pointer-events: none;
 }
 
 /* Glassmorphism utility classes */
 .glass-card {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(135, 149, 179, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(135, 149, 179, 0.2);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
@@ -38,10 +55,10 @@ body {
 }
 
 .glass-card-hover:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(135, 149, 179, 0.15);
+  border-color: rgba(135, 149, 179, 0.3);
   transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 12px 40px 0 rgba(43, 110, 255, 0.2);
+  box-shadow: 0 12px 40px 0 rgba(135, 149, 179, 0.2);
 }
 
 /* Button glow effect */
@@ -51,7 +68,7 @@ body {
 }
 
 .btn-glow:hover {
-  box-shadow: 0 0 20px rgba(43, 110, 255, 0.5);
+  box-shadow: 0 0 20px rgba(135, 149, 179, 0.5);
 }
 
 .btn-glow::before {
@@ -63,7 +80,7 @@ body {
   bottom: 0;
   border-radius: inherit;
   padding: 2px;
-  background: linear-gradient(135deg, #2B6EFF, #4DA6FF);
+  background: linear-gradient(135deg, #8795B3, #3A404D);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;

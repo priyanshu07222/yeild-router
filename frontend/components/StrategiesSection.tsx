@@ -28,7 +28,7 @@ const strategies = [
 
 export default function StrategiesSection() {
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8">
+    <section className="py-20 px-4 sm:px-6 lg:px-8 relative z-10">
       <div className="container mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -40,7 +40,7 @@ export default function StrategiesSection() {
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Available Strategies
           </h2>
-          <p className="text-lg text-[#A8C1D9] max-w-2xl mx-auto">
+          <p className="text-lg text-[#8795B3] max-w-2xl mx-auto">
             Choose from multiple yield strategies across Polkadot parachains
           </p>
         </motion.div>
@@ -66,14 +66,14 @@ export default function StrategiesSection() {
               
               <div className="space-y-4">
                 <div>
-                  <p className="text-[#A8C1D9] text-sm mb-1">APY</p>
-                  <p className="text-3xl font-bold text-[#4DA6FF]">
+                  <p className="text-[#8795B3] text-sm mb-1">APY</p>
+                  <p className="text-3xl font-bold text-[#8795B3]">
                     {strategy.apy}
                   </p>
                 </div>
                 
                 <div>
-                  <p className="text-[#A8C1D9] text-sm mb-1">Total Value Locked</p>
+                  <p className="text-[#8795B3] text-sm mb-1">Total Value Locked</p>
                   <p className="text-xl font-semibold text-white">
                     {strategy.tvl}
                   </p>

@@ -25,7 +25,7 @@ const features = [
 
 export default function FeaturesSection() {
   return (
-    <section id="features" className="py-20 px-4 sm:px-6 lg:px-8">
+    <section id="features" className="py-20 px-4 sm:px-6 lg:px-8 relative z-10">
       <div className="container mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -37,7 +37,7 @@ export default function FeaturesSection() {
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Key Features
           </h2>
-          <p className="text-lg text-[#A8C1D9] max-w-2xl mx-auto">
+          <p className="text-lg text-[#8795B3] max-w-2xl mx-auto">
             Everything you need to optimize your yield across the Polkadot ecosystem
           </p>
         </motion.div>
@@ -56,7 +56,7 @@ export default function FeaturesSection() {
               <h3 className="text-xl font-bold text-white mb-3">
                 {feature.title}
               </h3>
-              <p className="text-[#A8C1D9] leading-relaxed">
+              <p className="text-[#8795B3] leading-relaxed">
                 {feature.description}
               </p>
             </motion.div>

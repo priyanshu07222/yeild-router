@@ -52,7 +52,7 @@ export default function StrategyTable() {
         <h2 className="text-xl font-semibold text-white">Available Strategies</h2>
         <button
           onClick={rebalance}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+          className="px-4 py-2 bg-[#8795B3] hover:bg-[#3A404D] text-white font-medium rounded-lg transition-colors"
         >
           Rebalance
         </button>
@@ -83,7 +83,7 @@ export default function StrategyTable() {
                     key={index}
                     className={`transition-colors ${
                       isCurrentStrategy
-                        ? "bg-blue-500/20 border-l-4 border-blue-500"
+                        ? "bg-[#8795B3]/20 border-l-4 border-[#8795B3]"
                         : "hover:bg-white/5"
                     }`}
                   >
@@ -93,7 +93,7 @@ export default function StrategyTable() {
                           {formatAddress(strategy.address)}
                         </span>
                         {isCurrentStrategy && (
-                          <span className="px-2 py-1 text-xs font-semibold bg-blue-500/30 text-blue-300 rounded-full border border-blue-500/50">
+                          <span className="px-2 py-1 text-xs font-semibold bg-[#8795B3]/30 text-[#8795B3] rounded-full border border-[#8795B3]/50">
                             Active
                           </span>
                         )}
@@ -104,7 +104,7 @@ export default function StrategyTable() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`text-sm font-semibold ${
-                        isCurrentStrategy ? "text-blue-300" : "text-gray-300"
+                        isCurrentStrategy ? "text-[#8795B3]" : "text-[#8795B3]"
                       }`}>
                         {formatAPY(strategy.apy)}%
                       </span>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { formatEther } from "viem";
 import { useVault } from "@/hooks/useVault";
@@ -9,7 +9,12 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 export default function DepositCard() {
   const { address, isConnected } = useAccount();
   const [amount, setAmount] = useState("");
+  const [mounted, setMounted] = useState(false);
   const { deposit, isLoading, error, totalAssets, userShares } = useVault();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleDeposit = async () => {
     if (!isConnected) {
@@ -42,7 +47,7 @@ export default function DepositCard() {
       <h2 className="text-2xl font-semibold mb-6 text-white">Deposit to Vault</h2>
       
       {/* Wallet Connection Status */}
-      {!isConnected && (
+      {mounted && !isConnected && (
         <div className="mb-6 p-4 bg-yellow-500/20 border border-yellow-500/30 rounded-lg">
           <p className="text-yellow-400 text-sm mb-3">Please connect your wallet to deposit</p>
           <div className="flex justify-center">
@@ -54,15 +59,15 @@ export default function DepositCard() {
       {/* Vault Stats */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-          <p className="text-xs text-gray-400 mb-1">Total Vault Assets</p>
+          <p className="text-xs text-[#8795B3] mb-1">Total Vault Assets</p>
           <p className="text-xl font-bold text-white">
             {formatBigInt(totalAssets)}
           </p>
         </div>
         <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-          <p className="text-xs text-gray-400 mb-1">Your Shares</p>
+          <p className="text-xs text-[#8795B3] mb-1">Your Shares</p>
           <p className="text-xl font-bold text-white">
-            {isConnected ? formatBigInt(userShares) : "0.00"}
+            {mounted && isConnected ? formatBigInt(userShares) : "0.00"}
           </p>
         </div>
       </div>
@@ -70,7 +75,7 @@ export default function DepositCard() {
       {/* Deposit Form */}
       <div className="space-y-4">
         <div>
-          <label htmlFor="amount" className="block text-sm font-medium mb-2 text-gray-300">
+          <label htmlFor="amount" className="block text-sm font-medium mb-2 text-[#8795B3]">
             Token Amount
           </label>
           <input
@@ -79,7 +84,7 @@ export default function DepositCard() {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="0.00"
-            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-gray-400 backdrop-blur-sm text-lg"
+            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-[#8795B3] focus:border-[#8795B3] text-white placeholder-[#8795B3]/50 backdrop-blur-sm text-lg"
             step="0.01"
             min="0"
             disabled={!isConnected || isLoading}
@@ -94,14 +99,14 @@ export default function DepositCard() {
 
         <button
           onClick={handleDeposit}
-          disabled={!isConnected || isLoading || !amount || parseFloat(amount) <= 0}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-colors text-lg"
+          disabled={!mounted || !isConnected || isLoading || !amount || parseFloat(amount) <= 0}
+          className="w-full bg-[#8795B3] hover:bg-[#3A404D] disabled:bg-[#3A404D]/50 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-colors text-lg"
         >
           {isLoading ? "Processing..." : "Deposit"}
         </button>
 
-        {isConnected && (
-          <p className="text-xs text-gray-400 text-center">
+        {mounted && isConnected && (
+          <p className="text-xs text-[#8795B3] text-center">
             Connected: {address?.slice(0, 6)}...{address?.slice(-4)}
           </p>
         )}
