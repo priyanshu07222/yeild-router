@@ -6,12 +6,12 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navItems = [
-  { name: "Dashboard", href: "/dashboard", icon: "📊" },
-  { name: "Vault", href: "/deposit", icon: "🏦" },
-  { name: "Strategies", href: "/strategies", icon: "⚡" },
-  { name: "Leaderboard", href: "/leaderboard", icon: "🏆" },
-  { name: "Profile", href: "/profile", icon: "👤" },
-  { name: "Wallet", href: "/wallet", icon: "💼" },
+  { name: "Dashboard", href: "/dashboard" },
+  { name: "Vault", href: "/deposit" },
+  { name: "Strategies", href: "/strategies" },
+  { name: "Leaderboard", href: "/leaderboard" },
+  { name: "Profile", href: "/profile" },
+  { name: "Wallet", href: "/wallet" },
 ];
 
 export default function DashboardSidebar() {
@@ -86,13 +86,12 @@ export default function DashboardSidebar() {
                       key={item.href}
                       href={item.href}
                       onClick={() => setIsOpen(false)}
-                      className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${
+                      className={`flex items-center px-4 py-3 rounded-lg transition-all ${
                         isActive
                           ? "bg-[#8795B3]/20 text-white border border-[#8795B3]/30"
                           : "text-[#8795B3] hover:bg-white/5 hover:text-white"
                       }`}
                     >
-                      <span className="text-xl">{item.icon}</span>
                       <span className="font-medium">{item.name}</span>
                     </Link>
                   );
