@@ -22,7 +22,7 @@ export default function LandingNavbar() {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "glass-card border-b border-white/10" : "bg-transparent"
+        isScrolled ? "glass-card border-b border-[#8795B3]/25" : "bg-[#0F172B33] backdrop-blur-md border-b border-transparent"
       }`}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">

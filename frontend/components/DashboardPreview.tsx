@@ -39,16 +39,16 @@ export default function DashboardPreview() {
   ];
 
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8">
+    <section className="landing-section">
       <div className="container mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="glass-card rounded-2xl p-8 md:p-12 relative z-10"
+          className="glass-card glass-outline rounded-2xl p-8 md:p-12 relative z-10"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">
+          <h2 className="landing-heading text-3xl md:text-4xl mb-8 text-center">
             Dashboard Preview
           </h2>
           

@@ -25,7 +25,7 @@ const steps = [
 
 export default function HowItWorksSection() {
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 relative z-10">
+    <section className="landing-section">
       <div className="container mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -34,10 +34,10 @@ export default function HowItWorksSection() {
           transition={{ duration: 0.8 }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="landing-heading text-3xl md:text-4xl mb-4">
             How It Works
           </h2>
-          <p className="text-lg text-[#8795B3] max-w-2xl mx-auto">
+          <p className="landing-subtext text-lg max-w-2xl mx-auto">
             Simple three-step process to start earning maximum yield
           </p>
         </motion.div>
@@ -57,7 +57,7 @@ export default function HowItWorksSection() {
                 <div className="hidden md:block absolute top-12 left-full w-full h-0.5 bg-gradient-to-r from-[#8795B3] to-transparent z-0" />
               )}
               
-              <div className="glass-card rounded-xl p-8 glass-card-hover relative z-10">
+              <div className="glass-card glass-outline rounded-xl p-8 glass-card-hover relative z-10">
                 <div className="text-5xl font-bold text-[#8795B3] mb-4 opacity-50">
                   {step.number}
                 </div>

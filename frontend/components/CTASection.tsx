@@ -5,14 +5,14 @@ import Link from "next/link";
 
 export default function CTASection() {
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 relative z-10">
+    <section className="landing-section">
       <div className="container mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="glass-card rounded-2xl p-12 md:p-16 text-center"
+          className="glass-card glass-outline rounded-2xl p-12 md:p-16 text-center"
         >
           <motion.h2
             initial={{ opacity: 0, y: 20 }}

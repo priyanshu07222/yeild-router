@@ -15,7 +15,7 @@ export default function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+          <h1 className="landing-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-6 leading-tight">
             Cross-Chain Yield
             <br />
             <span className="bg-gradient-to-r from-[#8795B3] to-[#3A404D] bg-clip-text text-transparent">
@@ -29,7 +29,7 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-lg sm:text-xl md:text-2xl text-[#8795B3] mb-12 max-w-3xl mx-auto"
+            className="landing-subtext text-lg sm:text-xl md:text-2xl mb-12 max-w-3xl mx-auto"
           >
             Automatically route your assets to the highest yield strategy across parachains.
           </motion.p>
@@ -48,7 +48,7 @@ export default function HeroSection() {
             </Link>
             <Link
               href="/strategies"
-              className="glass-card px-8 py-4 text-white font-semibold rounded-lg transition-all duration-300 text-lg hover:bg-[#8795B3]/20"
+              className="glass-card glass-outline px-8 py-4 text-white font-semibold rounded-lg transition-all duration-300 text-lg hover:bg-[#8795B3]/20"
             >
               View Strategies
             </Link>

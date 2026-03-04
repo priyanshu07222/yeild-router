@@ -25,7 +25,7 @@ const features = [
 
 export default function FeaturesSection() {
   return (
-    <section id="features" className="py-20 px-4 sm:px-6 lg:px-8 relative z-10">
+    <section id="features" className="landing-section">
       <div className="container mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -34,10 +34,10 @@ export default function FeaturesSection() {
           transition={{ duration: 0.8 }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="landing-heading text-3xl md:text-4xl mb-4">
             Key Features
           </h2>
-          <p className="text-lg text-[#8795B3] max-w-2xl mx-auto">
+          <p className="landing-subtext text-lg max-w-2xl mx-auto">
             Everything you need to optimize your yield across the Polkadot ecosystem
           </p>
         </motion.div>
@@ -50,7 +50,7 @@ export default function FeaturesSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.2 }}
-              className="glass-card rounded-xl p-8 glass-card-hover"
+              className="glass-card glass-outline rounded-xl p-8 glass-card-hover"
             >
               <div className="text-5xl mb-4">{feature.icon}</div>
               <h3 className="text-xl font-bold text-white mb-3">

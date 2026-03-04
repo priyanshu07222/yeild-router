@@ -61,6 +61,39 @@ body::before {
   box-shadow: 0 12px 40px 0 rgba(135, 149, 179, 0.2);
 }
 
+/* Landing page layout helpers */
+.landing-section {
+  padding: 5rem 1rem;
+  position: relative;
+  z-index: 10;
+}
+
+@media (min-width: 640px) {
+  .landing-section {
+    padding: 5rem 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .landing-section {
+    padding: 6rem 2rem;
+  }
+}
+
+.landing-heading {
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.landing-subtext {
+  color: #8795b3;
+}
+
+.glass-outline {
+  border: 1px solid rgba(135, 149, 179, 0.25);
+}
+
 /* Button glow effect */
 .btn-glow {
   position: relative;
