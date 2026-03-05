@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navItems = [
+  { name: "Home", href: "/" },
   { name: "Dashboard", href: "/dashboard" },
   { name: "Vault", href: "/deposit" },
   { name: "Strategies", href: "/strategies" },

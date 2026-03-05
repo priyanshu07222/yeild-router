@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, Sector } from "recharts";
 
 const data = [
   { name: "Moonbeam", value: 45, color: "#8795B3" },
@@ -11,7 +12,13 @@ const data = [
 
 const COLORS = data.map((item) => item.color);
 
+const renderActiveShape = (props: any) => {
+  return <Sector {...props} outerRadius={(props.outerRadius ?? 100) + 8} />;
+};
+
 export default function StrategyAllocation() {
+  const [activeIndex, setActiveIndex] = useState<number | undefined>(undefined);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -30,6 +37,10 @@ export default function StrategyAllocation() {
             labelLine={false}
             label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
             outerRadius={100}
+            activeIndex={activeIndex}
+            activeShape={renderActiveShape}
+            onMouseEnter={(_, index) => setActiveIndex(index)}
+            onMouseLeave={() => setActiveIndex(undefined)}
             fill="#8884d8"
             dataKey="value"
           >
@@ -44,6 +55,9 @@ export default function StrategyAllocation() {
               borderRadius: "8px",
               color: "#FFFFFF",
             }}
+            itemStyle={{ color: "#FFFFFF" }}
+            labelStyle={{ color: "#A8C1D9" }}
+            cursor={{ fill: "rgba(135, 149, 179, 0.15)" }}
             formatter={(value: number) => [`${value}%`, "Allocation"]}
           />
           <Legend
