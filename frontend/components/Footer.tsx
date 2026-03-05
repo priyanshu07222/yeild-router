@@ -57,7 +57,7 @@ export default function Footer() {
         
         <div className="pt-8 border-t border-white/10 text-center">
           <p className="text-[#8795B3] text-sm">
-            © 2024 Yield Router. All rights reserved.
+            © 2026 Yield Router. All rights reserved.
           </p>
         </div>
       </div>

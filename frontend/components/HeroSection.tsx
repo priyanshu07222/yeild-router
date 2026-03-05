@@ -7,7 +7,7 @@ export default function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-20 pb-32 px-4 sm:px-6 lg:px-8 overflow-hidden">
       {/* Overlay for better text readability */}
-      <div className="absolute inset-0 bg-[#0F172B33] z-0" />
+      <div className="absolute inset-0 bg-[#0F172B33] z-0 pointer-events-none" />
       
       <div className="container mx-auto text-center relative z-10">
         <motion.div
@@ -38,17 +38,17 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            className="flex flex-col sm:flex-row gap-4 justify-center items-center relative z-20 pointer-events-auto"
           >
             <Link
               href="/deposit"
-              className="btn-glow px-8 py-4 bg-[#8795B3] hover:bg-[#3A404D] text-white font-semibold rounded-lg transition-all duration-300 text-lg"
+              className="btn-glow px-8 py-4 bg-[#8795B3] hover:bg-[#3A404D] text-white font-semibold rounded-lg transition-all duration-300 text-lg cursor-pointer active:scale-[0.98]"
             >
               Start Earning
             </Link>
             <Link
               href="/strategies"
-              className="glass-card glass-outline px-8 py-4 text-white font-semibold rounded-lg transition-all duration-300 text-lg hover:bg-[#8795B3]/20"
+              className="glass-card glass-outline px-8 py-4 text-white font-semibold rounded-lg transition-all duration-300 text-lg hover:bg-[#8795B3]/20 cursor-pointer active:scale-[0.98]"
             >
               View Strategies
             </Link>
