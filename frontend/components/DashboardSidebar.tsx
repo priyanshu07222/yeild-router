@@ -16,28 +16,46 @@ const navItems = [
 
 export default function DashboardSidebar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
-    const checkDesktop = () => {
-      setIsDesktop(window.innerWidth >= 768);
-      if (window.innerWidth >= 768) {
-        setIsOpen(true);
-      }
-    };
-    
-    checkDesktop();
-    window.addEventListener("resize", checkDesktop);
-    return () => window.removeEventListener("resize", checkDesktop);
-  }, []);
+    setIsOpen(false);
+  }, [pathname]);
+
+  const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => (
+    <div className="p-6 h-full flex flex-col border border-dashed border-[#dbe3f5]/60 rounded-3xl">
+      <Link href="/" className="mb-8" onClick={onNavigate}>
+        <h2 className="text-2xl font-bold text-white">Yield Router</h2>
+      </Link>
+
+      <nav className="flex-1 space-y-2">
+        {navItems.map((item) => {
+          const isActive = pathname === item.href;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={onNavigate}
+              className={`flex items-center px-4 py-3 rounded-lg transition-all ${
+                isActive
+                  ? "bg-[#8795B3]/20 text-white border border-[#8795B3]/30"
+                  : "text-[#8795B3] hover:bg-white/5 hover:text-white"
+              }`}
+            >
+              <span className="font-medium">{item.name}</span>
+            </Link>
+          );
+        })}
+      </nav>
+    </div>
+  );
 
   return (
     <>
       {/* Mobile Hamburger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-50 md:hidden glass-card p-3 rounded-lg text-white"
+        className="fixed top-4 left-4 z-50 md:hidden p-3 rounded-lg text-white border border-dashed border-[#dbe3f5]/60 bg-[#0F172B33]"
       >
         <svg
           className="w-6 h-6"
@@ -63,47 +81,28 @@ export default function DashboardSidebar() {
         </svg>
       </button>
 
-      {/* Sidebar */}
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:block fixed top-0 left-0 h-screen w-64 rounded-r-3xl z-40 p-3 bg-[#0F172B33]">
+        <SidebarContent />
+      </aside>
+
+      {/* Mobile Sidebar */}
       <AnimatePresence>
-        {(isOpen || isDesktop) && (
+        {isOpen && (
           <motion.aside
             initial={{ x: -300 }}
             animate={{ x: 0 }}
             exit={{ x: -300 }}
             transition={{ duration: 0.3 }}
-            className="fixed top-0 left-0 h-screen w-64 glass-card border-r border-white/10 z-40"
+            className="fixed top-0 left-0 h-screen w-64 rounded-r-3xl z-40 p-3 bg-[#0F172B33]"
           >
-            <div className="p-6 h-full flex flex-col">
-              <Link href="/" className="mb-8">
-                <h2 className="text-2xl font-bold text-white">Yield Router</h2>
-              </Link>
-
-              <nav className="flex-1 space-y-2">
-                {navItems.map((item) => {
-                  const isActive = pathname === item.href;
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setIsOpen(false)}
-                      className={`flex items-center px-4 py-3 rounded-lg transition-all ${
-                        isActive
-                          ? "bg-[#8795B3]/20 text-white border border-[#8795B3]/30"
-                          : "text-[#8795B3] hover:bg-white/5 hover:text-white"
-                      }`}
-                    >
-                      <span className="font-medium">{item.name}</span>
-                    </Link>
-                  );
-                })}
-              </nav>
-            </div>
+            <SidebarContent onNavigate={() => setIsOpen(false)} />
           </motion.aside>
         )}
       </AnimatePresence>
 
       {/* Overlay for mobile */}
-      {isOpen && !isDesktop && (
+      {isOpen && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
