@@ -38,8 +38,8 @@ export default function DashboardSidebar() {
               onClick={onNavigate}
               className={`flex items-center px-4 py-3 rounded-lg transition-all ${
                 isActive
-                  ? "bg-[#8795B3]/20 text-white border border-[#8795B3]/30"
-                  : "text-[#8795B3] hover:bg-white/5 hover:text-white"
+                  ? "text-white border border-[#8795B3]/50"
+                  : "text-[#8795B3] hover:text-white"
               }`}
             >
               <span className="font-medium">{item.name}</span>
@@ -55,7 +55,7 @@ export default function DashboardSidebar() {
       {/* Mobile Hamburger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-50 md:hidden p-3 rounded-lg text-white border border-dashed border-[#dbe3f5]/60 bg-[#0F172B33]"
+        className="fixed top-4 left-4 z-50 md:hidden p-3 rounded-lg text-white border border-dashed border-[#dbe3f5]/60"
       >
         <svg
           className="w-6 h-6"
@@ -82,7 +82,7 @@ export default function DashboardSidebar() {
       </button>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden md:block fixed top-0 left-0 h-screen w-64 rounded-r-3xl z-40 p-3 bg-[#0F172B33]">
+      <aside className="hidden md:block fixed top-0 left-0 h-screen w-64 rounded-r-3xl z-40 p-3">
         <SidebarContent />
       </aside>
 
@@ -94,7 +94,7 @@ export default function DashboardSidebar() {
             animate={{ x: 0 }}
             exit={{ x: -300 }}
             transition={{ duration: 0.3 }}
-            className="fixed top-0 left-0 h-screen w-64 rounded-r-3xl z-40 p-3 bg-[#0F172B33]"
+            className="fixed top-0 left-0 h-screen w-64 rounded-r-3xl z-40 p-3"
           >
             <SidebarContent onNavigate={() => setIsOpen(false)} />
           </motion.aside>
