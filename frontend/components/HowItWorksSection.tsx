@@ -42,7 +42,7 @@ export default function HowItWorksSection() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10 items-start">
           {steps.map((step, index) => (
             <motion.div
               key={index}
@@ -50,9 +50,11 @@ export default function HowItWorksSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.2 }}
-              className="relative"
+              className={`relative ${
+                index === 1 ? "md:translate-y-12 lg:translate-y-16" : "md:translate-y-0"
+              }`}
             >
-              <div className="glass-card glass-outline rounded-xl p-8 glass-card-hover relative z-10">
+              <div className="glass-card glass-outline rounded-xl p-8 glass-card-hover relative z-10 min-h-[260px]">
                 <div className="text-5xl font-bold text-[#8795B3] mb-4 opacity-50">
                   {step.number}
                 </div>
