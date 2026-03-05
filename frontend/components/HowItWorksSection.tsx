@@ -52,11 +52,6 @@ export default function HowItWorksSection() {
               transition={{ duration: 0.5, delay: index * 0.2 }}
               className="relative"
             >
-              {/* Connector line */}
-              {index < steps.length - 1 && (
-                <div className="hidden md:block absolute top-12 left-full w-full h-0.5 bg-gradient-to-r from-[#8795B3] to-transparent z-0" />
-              )}
-              
               <div className="glass-card glass-outline rounded-xl p-8 glass-card-hover relative z-10">
                 <div className="text-5xl font-bold text-[#8795B3] mb-4 opacity-50">
                   {step.number}
