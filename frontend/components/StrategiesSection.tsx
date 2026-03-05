@@ -8,21 +8,18 @@ const strategies = [
     apy: "15.2%",
     tvl: "$2.4M",
     riskLevel: "Low",
-    riskColor: "text-green-400",
   },
   {
     name: "Astar",
     apy: "12.8%",
     tvl: "$1.8M",
     riskLevel: "Medium",
-    riskColor: "text-yellow-400",
   },
   {
     name: "Hydration",
     apy: "18.5%",
     tvl: "$950K",
     riskLevel: "Medium",
-    riskColor: "text-yellow-400",
   },
 ];
 
@@ -59,7 +56,9 @@ export default function StrategiesSection() {
                 <h3 className="text-2xl font-bold text-white">
                   {strategy.name}
                 </h3>
-                <span className={`text-sm font-semibold ${strategy.riskColor}`}>
+                <span
+                  className="px-3 py-1 rounded-full border text-sm font-semibold text-[#8795B3] bg-[#8795B3]/15 border-[#8795B3]/35"
+                >
                   {strategy.riskLevel}
                 </span>
               </div>
