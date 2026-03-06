@@ -49,7 +49,7 @@ export default function WithdrawCard() {
             />
             <button
               onClick={handleMax}
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-sm font-medium text-white transition-colors"
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-sm font-medium text-white transition-colors cursor-pointer"
             >
               Max
             </button>
@@ -63,7 +63,7 @@ export default function WithdrawCard() {
         <button
           onClick={handleWithdraw}
           disabled={isLoading || !shares || parseFloat(shares) <= 0}
-          className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+          className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold py-2 px-4 rounded-lg transition-colors cursor-pointer"
         >
           {isLoading ? "Processing..." : "Withdraw"}
         </button>

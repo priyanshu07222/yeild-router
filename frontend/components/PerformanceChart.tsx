@@ -52,7 +52,7 @@ export default function PerformanceChart() {
             <button
               key={filter.days}
               onClick={() => setSelectedFilter(filter.days)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                 selectedFilter === filter.days
                   ? "bg-[#7C8CFF] text-white"
                   : "glass-card text-[#8795B3] hover:text-white"

@@ -52,7 +52,7 @@ export default function StrategyTable() {
         <h2 className="text-xl font-semibold text-white">Available Strategies</h2>
         <button
           onClick={rebalance}
-          className="px-4 py-2 bg-[#8795B3] hover:bg-[#3A404D] text-white font-medium rounded-lg transition-colors"
+          className="px-4 py-2 bg-[#8795B3] hover:bg-[#3A404D] text-white font-medium rounded-lg transition-colors cursor-pointer"
         >
           Rebalance
         </button>

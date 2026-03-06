@@ -41,24 +41,24 @@ export default function LandingNavbar() {
       }`}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative flex justify-between items-center h-16 lg:h-20">
+        <div className="relative flex justify-between items-center h-16 lg:h-20 gap-4">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5">
+          <Link href="/" className="flex items-center gap-2.5 flex-shrink-0 z-20">
             <Route className="h-6 w-6 text-[#8795B3]" strokeWidth={2.4} />
             <div className="text-2xl font-bold text-white">Yield Router</div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-12 absolute left-1/2 -translate-x-1/2">
+          {/* Desktop Navigation - with max-width constraint */}
+          <div className="hidden lg:flex items-center space-x-8 xl:space-x-12 absolute left-1/2 -translate-x-1/2 max-w-md pointer-events-none z-10">
             <Link
               href="#features"
-              className="text-[#8795B3] hover:text-white transition-colors text-sm font-medium"
+              className="text-[#8795B3] hover:text-white transition-colors text-sm font-medium pointer-events-auto whitespace-nowrap"
             >
               Docs
             </Link>
             <Link
               href="/deposit"
-              className="text-[#8795B3] hover:text-white transition-colors text-sm font-medium"
+              className="text-[#8795B3] hover:text-white transition-colors text-sm font-medium pointer-events-auto whitespace-nowrap"
             >
               Dashboard
             </Link>
@@ -66,13 +66,13 @@ export default function LandingNavbar() {
               href="https://github.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#8795B3] hover:text-white transition-colors text-sm font-medium"
+              className="text-[#8795B3] hover:text-white transition-colors text-sm font-medium pointer-events-auto whitespace-nowrap"
             >
               Github
             </a>
           </div>
 
-          <div className="hidden md:block">
+          <div className="hidden md:block flex-shrink-0 z-20 ml-auto">
             <ConnectButton />
           </div>
 
@@ -80,7 +80,7 @@ export default function LandingNavbar() {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-white p-2"
+              className="text-white p-2 rounded-lg border border-dashed border-[#8795B3]/40 hover:border-[#8795B3]/70 transition-colors cursor-pointer"
             >
               <svg
                 className="w-6 h-6"
@@ -132,7 +132,7 @@ export default function LandingNavbar() {
             >
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="absolute top-5 right-5 text-white p-2 rounded-lg border border-[#8795B3]/30 bg-[#111A2B]"
+                className="absolute top-5 right-5 text-white p-2 rounded-lg border border-[#8795B3]/30 bg-[#111A2B] cursor-pointer"
                 aria-label="Close menu"
               >
                 <X className="w-5 h-5" />

@@ -19,7 +19,7 @@ export default function CTASection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6"
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-4 sm:mb-6 px-2"
           >
             Start Earning Passive Yield
           </motion.h2>
@@ -29,7 +29,7 @@ export default function CTASection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg md:text-xl text-[#8795B3] mb-8 max-w-2xl mx-auto"
+            className="text-base sm:text-lg md:text-xl lg:text-2xl text-[#8795B3] mb-6 sm:mb-8 max-w-xs sm:max-w-md md:max-w-2xl mx-auto px-4"
           >
             Join thousands of users earning maximum yield across the Polkadot ecosystem
           </motion.p>
@@ -39,10 +39,11 @@ export default function CTASection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.4 }}
+            className="px-4"
           >
             <Link
               href="/deposit"
-              className="btn-glow inline-block px-10 py-5 bg-[#8795B3] hover:bg-[#3A404D] text-white font-semibold rounded-lg transition-all duration-300 text-lg md:text-xl"
+              className="btn-glow inline-block w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-[#8795B3] hover:bg-[#3A404D] text-white font-semibold rounded-lg transition-all duration-300 text-base sm:text-lg md:text-xl min-w-[200px] sm:min-w-[240px] text-center"
             >
               Launch App
             </Link>

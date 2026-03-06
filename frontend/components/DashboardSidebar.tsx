@@ -60,7 +60,7 @@ export default function DashboardSidebar() {
           <button
             onClick={onClose}
             aria-label="Close sidebar"
-            className="text-white p-2 rounded-lg border border-[#8795B3]/25 bg-[#0F172B]/60 hover:bg-[#1B273D]/70 transition-colors"
+            className="text-white p-2 rounded-lg border border-[#8795B3]/25 bg-[#0F172B]/60 hover:bg-[#1B273D]/70 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -95,24 +95,27 @@ export default function DashboardSidebar() {
     <>
       {/* Mobile Hamburger Button */}
       {!isOpen && (
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed top-4 left-4 z-50 md:hidden p-3 rounded-lg text-white border border-dashed border-[#dbe3f5]/60"
-      >
-        <svg
-          className="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+      <div className="fixed top-4 left-4 z-50 md:hidden">
+        <div className="absolute inset-0 bg-[#0B1424]/80 backdrop-blur-xl rounded-lg -m-2" />
+        <button
+          onClick={() => setIsOpen(true)}
+          className="relative p-3 rounded-lg text-white border border-dashed border-[#dbe3f5]/60 cursor-pointer"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M4 6h16M4 12h16M4 18h16"
-          />
-        </svg>
-      </button>
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </button>
+      </div>
       )}
 
       {/* Desktop Sidebar */}

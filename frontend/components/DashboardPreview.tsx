@@ -51,7 +51,7 @@ export default function DashboardPreview() {
   return (
     <section ref={sectionRef} className="landing-section">
       <div className="container mx-auto">
-        <h2 className="landing-heading text-3xl md:text-4xl mb-8 text-center">
+        <h2 className="landing-heading text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-6 sm:mb-8 text-center px-4">
           Dashboard Preview
         </h2>
 
@@ -60,25 +60,25 @@ export default function DashboardPreview() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="glass-card glass-outline rounded-2xl p-8 md:p-12 relative overflow-hidden"
+          className="glass-card glass-outline rounded-xl sm:rounded-2xl p-6 sm:p-8 md:p-10 lg:p-12 relative overflow-hidden"
         >
           <div className="absolute -top-24 -left-24 h-64 w-64 rounded-full bg-[#7C8CFF]/15 blur-3xl pointer-events-none" />
           <div className="absolute -bottom-28 -right-20 h-72 w-72 rounded-full bg-[#34D399]/12 blur-3xl pointer-events-none" />
 
-          <div className="relative z-10 grid grid-cols-1 lg:hidden gap-6 items-center">
+          <div className="relative z-10 grid grid-cols-1 lg:hidden gap-4 sm:gap-6 items-center">
             <motion.div
               initial={{ opacity: 0, y: 18, filter: "blur(10px)" }}
               whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="glass-card rounded-2xl p-6 border border-[#8795B3]/30 text-center"
+              className="glass-card rounded-xl sm:rounded-2xl p-5 sm:p-6 border border-[#8795B3]/30 text-center"
             >
-              <p className="text-[#8795B3] text-sm mb-3">Total Value Locked</p>
-              <p className="text-4xl md:text-5xl font-bold text-white mb-2">
+              <p className="text-[#8795B3] text-xs sm:text-sm mb-2 sm:mb-3">Total Value Locked</p>
+              <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2">
                 ${formatValue(totalAssets)}
               </p>
-              <p className="text-[#34D399] text-sm mb-4">+12.5% this week</p>
-              <div className="h-2 rounded-full bg-[#3A404D]/40 overflow-hidden max-w-xs mx-auto">
+              <p className="text-[#34D399] text-xs sm:text-sm mb-3 sm:mb-4">+12.5% this week</p>
+              <div className="h-2 rounded-full bg-[#3A404D]/40 overflow-hidden max-w-[200px] sm:max-w-xs mx-auto">
                 <motion.div
                   initial={{ width: 0 }}
                   whileInView={{ width: "78%" }}
@@ -89,7 +89,7 @@ export default function DashboardPreview() {
               </div>
             </motion.div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 sm:gap-4">
               {stats.map((stat, index) => (
                 <motion.div
                   key={stat.label}
@@ -97,15 +97,15 @@ export default function DashboardPreview() {
                   whileInView={{ opacity: 1, y: 0, x: 0, filter: "blur(0px)" }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.55, delay: 0.15 + index * 0.12 }}
-                  className="glass-card rounded-xl p-5 border text-center"
+                  className="glass-card rounded-lg sm:rounded-xl p-4 sm:p-5 border text-center"
                   style={{
                     borderColor: `${stat.accent}66`,
                     background: `linear-gradient(135deg, ${stat.accent}22 0%, rgba(15,23,43,0.25) 100%)`,
                   }}
                 >
                   <p className="text-[#A8C1D9] text-xs mb-1">{stat.label}</p>
-                  <p className="text-2xl font-bold text-white">{stat.value}</p>
-                  <p className="text-sm mt-1" style={{ color: stat.accent }}>{stat.change}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-white">{stat.value}</p>
+                  <p className="text-xs sm:text-sm mt-1" style={{ color: stat.accent }}>{stat.change}</p>
                 </motion.div>
               ))}
             </div>

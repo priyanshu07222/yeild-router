@@ -140,8 +140,8 @@ export default function LeaderboardPage() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <h3 className="text-white text-2xl font-semibold">Monthly Leaderboard</h3>
             <div className="glass-card rounded-full p-1 inline-flex w-fit">
-              <button className="px-4 py-1.5 rounded-full bg-[#3A404D] text-white text-sm">Monthly</button>
-              <button className="px-4 py-1.5 rounded-full text-[#8795B3] text-sm">All Time</button>
+              <button className="px-4 py-1.5 rounded-full bg-[#3A404D] text-white text-sm cursor-pointer hover:bg-[#4A5E6D] transition-colors">Monthly</button>
+              <button className="px-4 py-1.5 rounded-full text-[#8795B3] text-sm cursor-pointer hover:bg-[#3A404D]/30 transition-colors">All Time</button>
             </div>
           </div>
 

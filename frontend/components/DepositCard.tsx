@@ -100,7 +100,7 @@ export default function DepositCard() {
         <button
           onClick={handleDeposit}
           disabled={!mounted || !isConnected || isLoading || !amount || parseFloat(amount) <= 0}
-          className="w-full bg-[#8795B3] hover:bg-[#3A404D] disabled:bg-[#3A404D]/50 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-colors text-lg"
+          className="w-full bg-[#8795B3] hover:bg-[#3A404D] disabled:bg-[#3A404D]/50 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-colors text-lg cursor-pointer"
         >
           {isLoading ? "Processing..." : "Deposit"}
         </button>
