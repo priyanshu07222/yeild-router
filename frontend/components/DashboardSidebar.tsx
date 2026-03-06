@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { name: "Home", href: "/", icon: Home },
+  { name: "Home", href: "/landing", icon: Home },
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Vault", href: "/deposit", icon: Landmark },
   { name: "Strategies", href: "/strategies", icon: GitBranch },
@@ -50,7 +50,7 @@ export default function DashboardSidebar() {
       }`}
     >
       <div className="mb-8 flex items-center justify-between gap-3">
-        <Link href="/" className="min-w-0" onClick={onNavigate}>
+        <Link href="/landing" className="min-w-0" onClick={onNavigate}>
           <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
             <Route className="w-5 h-5 md:w-6 md:h-6 text-[#8795B3]" strokeWidth={2.4} />
             <span className="truncate">Yield Router</span>

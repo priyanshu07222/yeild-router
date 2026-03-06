@@ -43,7 +43,7 @@ export default function LandingNavbar() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative flex justify-between items-center h-16 lg:h-20 gap-4">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 flex-shrink-0 z-20">
+          <Link href="/dashboard" className="flex items-center gap-2.5 flex-shrink-0 z-20">
             <Route className="h-6 w-6 text-[#8795B3]" strokeWidth={2.4} />
             <div className="text-2xl font-bold text-white">Yield Router</div>
           </Link>
@@ -140,7 +140,7 @@ export default function LandingNavbar() {
 
               <div className="flex items-center justify-between mb-8">
                 <Link
-                  href="/"
+                  href="/dashboard"
                   className="flex items-center gap-2.5"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
