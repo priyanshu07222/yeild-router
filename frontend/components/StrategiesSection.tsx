@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 const strategies = [
   {
@@ -23,9 +24,47 @@ const strategies = [
   },
 ];
 
+const cardMotion = [
+  { rotate: -2, y: -6 },
+  { rotate: 1.5, y: -10 },
+  { rotate: -1, y: -7 },
+];
+
 export default function StrategiesSection() {
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start 85%", "end 30%"],
+  });
+
+  const cardX = [
+    useTransform(scrollYProgress, [0.0, 0.4], [90, 0]),
+    useTransform(scrollYProgress, [0.12, 0.55], [105, 0]),
+    useTransform(scrollYProgress, [0.24, 0.7], [120, 0]),
+  ];
+  const cardOpacity = [
+    useTransform(scrollYProgress, [0.0, 0.4], [0.4, 1]),
+    useTransform(scrollYProgress, [0.12, 0.55], [0.4, 1]),
+    useTransform(scrollYProgress, [0.24, 0.7], [0.4, 1]),
+  ];
+  const cardBlur = [
+    useTransform(scrollYProgress, [0.0, 0.4], [10, 0]),
+    useTransform(scrollYProgress, [0.12, 0.55], [10, 0]),
+    useTransform(scrollYProgress, [0.24, 0.7], [10, 0]),
+  ];
+  const cardFilter = [
+    useTransform(cardBlur[0], (v) => `blur(${v}px)`),
+    useTransform(cardBlur[1], (v) => `blur(${v}px)`),
+    useTransform(cardBlur[2], (v) => `blur(${v}px)`),
+  ];
+  const cardSettleRotate = [
+    useTransform(scrollYProgress, [0.0, 0.4], [-4, 0]),
+    useTransform(scrollYProgress, [0.12, 0.55], [3, 0]),
+    useTransform(scrollYProgress, [0.24, 0.7], [-2, 0]),
+  ];
+
   return (
-    <section className="landing-section">
+    <section ref={sectionRef} className="landing-section">
       <div className="container mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -46,12 +85,34 @@ export default function StrategiesSection() {
           {strategies.map((strategy, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.15 }}
-              className="glass-card glass-outline rounded-xl p-8 glass-card-hover"
+              style={{
+                x: cardX[index],
+                opacity: cardOpacity[index],
+                filter: cardFilter[index],
+                rotate: cardSettleRotate[index],
+              }}
+              whileHover={{
+                scale: 1.03,
+                rotate: cardMotion[index].rotate,
+                y: cardMotion[index].y,
+                transition: { type: "spring", stiffness: 220, damping: 18 },
+              }}
+              className="glass-card glass-outline rounded-xl p-8 glass-card-hover relative overflow-hidden"
             >
+              <motion.div
+                className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-[#8795B3]/20 blur-2xl"
+                animate={{
+                  x: [0, -8, 4, 0],
+                  y: [0, 6, -4, 0],
+                  opacity: [0.35, 0.55, 0.45, 0.35],
+                }}
+                transition={{
+                  duration: 5 + index,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+
               <div className="flex justify-between items-start mb-4">
                 <h3 className="text-2xl font-bold text-white">
                   {strategy.name}
@@ -66,9 +127,13 @@ export default function StrategiesSection() {
               <div className="space-y-4">
                 <div>
                   <p className="text-[#8795B3] text-sm mb-1">APY</p>
-                  <p className="text-3xl font-bold text-[#8795B3]">
+                  <motion.p
+                    className="text-3xl font-bold text-[#8795B3]"
+                    whileHover={{ scale: 1.04 }}
+                    transition={{ duration: 0.2 }}
+                  >
                     {strategy.apy}
-                  </p>
+                  </motion.p>
                 </div>
                 
                 <div>

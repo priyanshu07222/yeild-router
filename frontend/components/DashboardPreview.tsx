@@ -1,10 +1,41 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { useVault } from "@/hooks/useVault";
 
 export default function DashboardPreview() {
   const { totalAssets } = useVault();
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start 80%", "end 35%"],
+  });
+
+  const tvlX = useTransform(scrollYProgress, [0.0, 0.32], [-180, 0]);
+  const tvlOpacity = useTransform(scrollYProgress, [0.0, 0.32], [0.45, 1]);
+  const tvlBlur = useTransform(scrollYProgress, [0.0, 0.32], [12, 0]);
+  const tvlFilter = useTransform(tvlBlur, (v) => `blur(${v}px)`);
+
+  const card1X = useTransform(scrollYProgress, [0.0, 0.35], [240, 0]);
+  const card2X = useTransform(scrollYProgress, [0.12, 0.52], [210, 0]);
+  const card3X = useTransform(scrollYProgress, [0.26, 0.68], [180, 0]);
+
+  const card1Opacity = useTransform(scrollYProgress, [0.0, 0.35], [0.45, 1]);
+  const card2Opacity = useTransform(scrollYProgress, [0.12, 0.52], [0.45, 1]);
+  const card3Opacity = useTransform(scrollYProgress, [0.26, 0.68], [0.45, 1]);
+
+  const card1Blur = useTransform(scrollYProgress, [0.0, 0.35], [12, 0]);
+  const card2Blur = useTransform(scrollYProgress, [0.12, 0.52], [12, 0]);
+  const card3Blur = useTransform(scrollYProgress, [0.26, 0.68], [12, 0]);
+
+  const card1Filter = useTransform(card1Blur, (v) => `blur(${v}px)`);
+  const card2Filter = useTransform(card2Blur, (v) => `blur(${v}px)`);
+  const card3Filter = useTransform(card3Blur, (v) => `blur(${v}px)`);
+
+  const cardX = [card1X, card2X, card3X];
+  const cardOpacity = [card1Opacity, card2Opacity, card3Opacity];
+  const cardFilter = [card1Filter, card2Filter, card3Filter];
 
   const formatValue = (value: bigint | null) => {
     if (!value) return "0.00";
@@ -18,8 +49,12 @@ export default function DashboardPreview() {
   ];
 
   return (
-    <section className="landing-section">
+    <section ref={sectionRef} className="landing-section">
       <div className="container mx-auto">
+        <h2 className="landing-heading text-3xl md:text-4xl mb-8 text-center">
+          Dashboard Preview
+        </h2>
+
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -29,10 +64,6 @@ export default function DashboardPreview() {
         >
           <div className="absolute -top-24 -left-24 h-64 w-64 rounded-full bg-[#7C8CFF]/15 blur-3xl pointer-events-none" />
           <div className="absolute -bottom-28 -right-20 h-72 w-72 rounded-full bg-[#34D399]/12 blur-3xl pointer-events-none" />
-
-          <h2 className="landing-heading text-3xl md:text-4xl mb-8 text-center">
-            Dashboard Preview
-          </h2>
 
           <div className="relative z-10 grid grid-cols-1 lg:hidden gap-6 items-start">
             <motion.div
@@ -87,6 +118,11 @@ export default function DashboardPreview() {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
               className="glass-card rounded-2xl p-6 border border-[#8795B3]/30 lg:col-span-1 min-h-[280px] flex flex-col justify-between"
+              style={{
+                x: tvlX,
+                opacity: tvlOpacity,
+                filter: tvlFilter,
+              }}
             >
               <p className="text-[#8795B3] text-sm mb-3">Total Value Locked</p>
               <p className="text-4xl md:text-5xl font-bold text-white mb-2">
@@ -108,17 +144,16 @@ export default function DashboardPreview() {
               {stats.map((stat, index) => (
                 <motion.div
                   key={stat.label}
-                  initial={{ opacity: 0, y: 25, x: 15, filter: "blur(10px)" }}
-                  whileInView={{ opacity: 1, y: 0, x: 0, filter: "blur(0px)" }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.55, delay: 0.15 + index * 0.12 }}
                   whileHover={{ y: -6, scale: 1.02 }}
                   className="absolute glass-card rounded-xl p-4 border w-[34%] min-h-[160px] flex flex-col justify-between"
                   style={{
                     top: `${index * 120}px`,
                     right: `${index * 31}%`,
-                    transform: `rotate(${index === 0 ? -6 : index === 1 ? 1 : 7}deg)`,
+                    rotate: index === 0 ? -6 : index === 1 ? 1 : 7,
                     zIndex: 10 + index,
+                    x: cardX[index],
+                    opacity: cardOpacity[index],
+                    filter: cardFilter[index],
                     borderColor: `${stat.accent}66`,
                     background: `linear-gradient(135deg, ${stat.accent}22 0%, rgba(15,23,43,0.25) 100%)`,
                   }}
