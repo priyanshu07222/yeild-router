@@ -5,9 +5,9 @@ import { motion } from "framer-motion";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, Sector } from "recharts";
 
 const data = [
-  { name: "Moonbeam", value: 45, color: "#8795B3" },
-  { name: "Astar", value: 30, color: "#3A404D" },
-  { name: "Hydration", value: 25, color: "#6B7A9F" },
+  { name: "Moonbeam", value: 45, color: "#7C8CFF" },
+  { name: "Astar", value: 30, color: "#34D399" },
+  { name: "Hydration", value: 25, color: "#F59E0B" },
 ];
 
 const COLORS = data.map((item) => item.color);

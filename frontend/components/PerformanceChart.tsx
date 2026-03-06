@@ -54,7 +54,7 @@ export default function PerformanceChart() {
               onClick={() => setSelectedFilter(filter.days)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 selectedFilter === filter.days
-                  ? "bg-[#8795B3] text-white"
+                  ? "bg-[#7C8CFF] text-white"
                   : "glass-card text-[#8795B3] hover:text-white"
               }`}
             >
@@ -80,7 +80,7 @@ export default function PerformanceChart() {
           <Tooltip
             contentStyle={{
               backgroundColor: "rgba(7, 27, 46, 0.95)",
-              border: "1px solid rgba(255, 255, 255, 0.15)",
+              border: "1px solid rgba(124, 140, 255, 0.5)",
               borderRadius: "8px",
               color: "#FFFFFF",
             }}
@@ -89,10 +89,10 @@ export default function PerformanceChart() {
           <Line
             type="monotone"
             dataKey="value"
-            stroke="#8795B3"
-            strokeWidth={2}
-            dot={{ fill: "#3A404D", r: 4 }}
-            activeDot={{ r: 6 }}
+            stroke="#7C8CFF"
+            strokeWidth={2.5}
+            dot={{ fill: "#34D399", r: 4 }}
+            activeDot={{ r: 6, fill: "#F59E0B" }}
           />
         </LineChart>
       </ResponsiveContainer>
