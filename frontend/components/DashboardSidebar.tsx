@@ -4,16 +4,26 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  Home,
+  LayoutDashboard,
+  Landmark,
+  GitBranch,
+  Trophy,
+  User,
+  Wallet,
+  type LucideIcon,
+} from "lucide-react";
 
 const navItems = [
-  { name: "Home", href: "/" },
-  { name: "Dashboard", href: "/dashboard" },
-  { name: "Vault", href: "/deposit" },
-  { name: "Strategies", href: "/strategies" },
-  { name: "Leaderboard", href: "/leaderboard" },
-  { name: "Profile", href: "/profile" },
-  { name: "Wallet", href: "/wallet" },
-];
+  { name: "Home", href: "/", icon: Home },
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Vault", href: "/deposit", icon: Landmark },
+  { name: "Strategies", href: "/strategies", icon: GitBranch },
+  { name: "Leaderboard", href: "/leaderboard", icon: Trophy },
+  { name: "Profile", href: "/profile", icon: User },
+  { name: "Wallet", href: "/wallet", icon: Wallet },
+] as const satisfies readonly { name: string; href: string; icon: LucideIcon }[];
 
 export default function DashboardSidebar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,20 +39,22 @@ export default function DashboardSidebar() {
         <h2 className="text-2xl font-bold text-white">Yield Router</h2>
       </Link>
 
-      <nav className="flex-1 space-y-2">
+      <nav className="flex-1 space-y-1">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
+          const Icon = item.icon;
           return (
             <Link
               key={item.href}
               href={item.href}
               onClick={onNavigate}
-              className={`flex items-center px-4 py-3 rounded-lg transition-all ${
+              className={`flex items-center px-4 py-2.5 rounded-lg transition-all ${
                 isActive
                   ? "text-white border border-[#8795B3]/50"
                   : "text-[#8795B3] hover:text-white"
               }`}
             >
+              <Icon className="w-4 h-4 mr-3 shrink-0" />
               <span className="font-medium">{item.name}</span>
             </Link>
           );
