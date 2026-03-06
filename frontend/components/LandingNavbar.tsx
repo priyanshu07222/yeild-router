@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { Route, X } from "lucide-react";
 
 export default function LandingNavbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -17,6 +18,18 @@ export default function LandingNavbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
+
   return (
     <motion.nav
       initial={{ y: -100 }}
@@ -28,16 +41,15 @@ export default function LandingNavbar() {
       }`}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16 lg:h-20">
+        <div className="relative flex justify-between items-center h-16 lg:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="text-2xl font-bold text-white">
-              Yield Router
-            </div>
+          <Link href="/" className="flex items-center gap-2.5">
+            <Route className="h-6 w-6 text-[#8795B3]" strokeWidth={2.4} />
+            <div className="text-2xl font-bold text-white">Yield Router</div>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-12 absolute left-1/2 -translate-x-1/2">
             <Link
               href="#features"
               className="text-[#8795B3] hover:text-white transition-colors text-sm font-medium"
@@ -58,12 +70,14 @@ export default function LandingNavbar() {
             >
               Github
             </a>
+          </div>
+
+          <div className="hidden md:block">
             <ConnectButton />
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center space-x-4">
-            <ConnectButton />
+          <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="text-white p-2"
@@ -94,39 +108,81 @@ export default function LandingNavbar() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden pb-4 space-y-3"
-          >
-            <Link
-              href="#features"
-              className="block text-[#8795B3] hover:text-white transition-colors"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Docs
-            </Link>
-            <Link
-              href="/deposit"
-              className="block text-[#8795B3] hover:text-white transition-colors"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Dashboard
-            </Link>
-            <a
-              href="https://github.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block text-[#8795B3] hover:text-white transition-colors"
-            >
-              Github
-            </a>
-          </motion.div>
-        )}
       </div>
+
+      {/* Mobile Slide Sidebar */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.22 }}
+              className="md:hidden fixed inset-0 h-dvh min-h-dvh z-[88] bg-[#020817]/90 backdrop-blur-2xl"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+
+            <motion.aside
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ duration: 0.28, ease: "easeOut" }}
+              className="md:hidden fixed top-0 right-0 h-dvh min-h-dvh w-[88%] max-w-sm z-[90] bg-[#0F172B] border-l border-[#8795B3]/20 p-6"
+            >
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="absolute top-5 right-5 text-white p-2 rounded-lg border border-[#8795B3]/30 bg-[#111A2B]"
+                aria-label="Close menu"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="flex items-center justify-between mb-8">
+                <Link
+                  href="/"
+                  className="flex items-center gap-2.5"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <Route className="h-6 w-6 text-[#8795B3]" strokeWidth={2.4} />
+                  <span className="text-2xl font-bold text-white">Yield Router</span>
+                </Link>
+
+              </div>
+
+              <div className="mb-8">
+                <ConnectButton />
+              </div>
+
+              <nav className="space-y-6">
+                <Link
+                  href="#features"
+                  className="block text-[#8795B3] hover:text-white transition-colors text-4xl"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Docs
+                </Link>
+                <Link
+                  href="/deposit"
+                  className="block text-[#8795B3] hover:text-white transition-colors text-4xl"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <a
+                  href="https://github.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-[#8795B3] hover:text-white transition-colors text-4xl"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Github
+                </a>
+              </nav>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
     </motion.nav>
   );
 }

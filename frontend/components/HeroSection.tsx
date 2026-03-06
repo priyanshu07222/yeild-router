@@ -42,13 +42,13 @@ export default function HeroSection() {
           >
             <Link
               href="/deposit"
-              className="btn-glow px-8 py-4 bg-[#8795B3] hover:bg-[#3A404D] text-white font-semibold rounded-lg transition-all duration-300 text-lg cursor-pointer active:scale-[0.98]"
+              className="px-8 py-4 min-w-[260px] text-center rounded-2xl border border-[#8795B3]/45 bg-gradient-to-br from-[#8795B3]/85 to-[#5D6F94]/85 text-white font-semibold text-lg shadow-[0_8px_30px_rgba(135,149,179,0.25)] hover:from-[#93A0BE]/90 hover:to-[#6679A1]/90 hover:shadow-[0_10px_34px_rgba(135,149,179,0.35)] transition-all duration-300 cursor-pointer active:scale-[0.98]"
             >
               Start Earning
             </Link>
             <Link
               href="/strategies"
-              className="glass-card glass-outline px-8 py-4 text-white font-semibold rounded-lg transition-all duration-300 text-lg hover:bg-[#8795B3]/20 cursor-pointer active:scale-[0.98]"
+              className="px-8 py-4 min-w-[260px] text-center rounded-2xl border border-[#8795B3]/45 bg-gradient-to-br from-[#6F81A6]/75 to-[#4F5E7F]/75 text-white font-semibold text-lg shadow-[0_8px_30px_rgba(95,114,153,0.22)] hover:from-[#7C8DB0]/80 hover:to-[#58688A]/80 hover:shadow-[0_10px_34px_rgba(95,114,153,0.32)] transition-all duration-300 cursor-pointer active:scale-[0.98]"
             >
               View Strategies
             </Link>

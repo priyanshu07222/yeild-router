@@ -132,7 +132,7 @@ export default function FeaturesSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.15 }}
-                className="glass-card glass-outline rounded-xl p-8 glass-card-hover"
+                className="glass-card glass-outline rounded-xl p-8 glass-card-hover text-center sm:text-left"
               >
                 <div className="text-5xl mb-4">{feature.icon}</div>
                 <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>

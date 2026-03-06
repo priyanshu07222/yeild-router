@@ -97,7 +97,7 @@ export default function StrategiesSection() {
                 y: cardMotion[index].y,
                 transition: { type: "spring", stiffness: 220, damping: 18 },
               }}
-              className="glass-card glass-outline rounded-xl p-8 glass-card-hover relative overflow-hidden"
+              className="glass-card glass-outline rounded-xl p-8 glass-card-hover relative overflow-hidden text-center md:text-left"
             >
               <motion.div
                 className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-[#8795B3]/20 blur-2xl"
@@ -113,7 +113,7 @@ export default function StrategiesSection() {
                 }}
               />
 
-              <div className="flex justify-between items-start mb-4">
+              <div className="flex flex-col items-center gap-3 mb-4 md:flex-row md:justify-between md:items-start">
                 <h3 className="text-2xl font-bold text-white">
                   {strategy.name}
                 </h3>

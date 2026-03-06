@@ -65,20 +65,20 @@ export default function DashboardPreview() {
           <div className="absolute -top-24 -left-24 h-64 w-64 rounded-full bg-[#7C8CFF]/15 blur-3xl pointer-events-none" />
           <div className="absolute -bottom-28 -right-20 h-72 w-72 rounded-full bg-[#34D399]/12 blur-3xl pointer-events-none" />
 
-          <div className="relative z-10 grid grid-cols-1 lg:hidden gap-6 items-start">
+          <div className="relative z-10 grid grid-cols-1 lg:hidden gap-6 items-center">
             <motion.div
               initial={{ opacity: 0, y: 18, filter: "blur(10px)" }}
               whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="glass-card rounded-2xl p-6 border border-[#8795B3]/30"
+              className="glass-card rounded-2xl p-6 border border-[#8795B3]/30 text-center"
             >
               <p className="text-[#8795B3] text-sm mb-3">Total Value Locked</p>
               <p className="text-4xl md:text-5xl font-bold text-white mb-2">
                 ${formatValue(totalAssets)}
               </p>
               <p className="text-[#34D399] text-sm mb-4">+12.5% this week</p>
-              <div className="h-2 rounded-full bg-[#3A404D]/40 overflow-hidden">
+              <div className="h-2 rounded-full bg-[#3A404D]/40 overflow-hidden max-w-xs mx-auto">
                 <motion.div
                   initial={{ width: 0 }}
                   whileInView={{ width: "78%" }}
@@ -97,7 +97,7 @@ export default function DashboardPreview() {
                   whileInView={{ opacity: 1, y: 0, x: 0, filter: "blur(0px)" }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.55, delay: 0.15 + index * 0.12 }}
-                  className="glass-card rounded-xl p-5 border"
+                  className="glass-card rounded-xl p-5 border text-center"
                   style={{
                     borderColor: `${stat.accent}66`,
                     background: `linear-gradient(135deg, ${stat.accent}22 0%, rgba(15,23,43,0.25) 100%)`,

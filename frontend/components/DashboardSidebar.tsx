@@ -12,6 +12,8 @@ import {
   Trophy,
   User,
   Wallet,
+  Route,
+  X,
   type LucideIcon,
 } from "lucide-react";
 
@@ -33,11 +35,37 @@ export default function DashboardSidebar() {
     setIsOpen(false);
   }, [pathname]);
 
-  const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => (
-    <div className="p-6 h-full flex flex-col border border-dashed border-[#dbe3f5]/60 rounded-3xl">
-      <Link href="/" className="mb-8" onClick={onNavigate}>
-        <h2 className="text-2xl font-bold text-white">Yield Router</h2>
-      </Link>
+  const SidebarContent = ({
+    onNavigate,
+    onClose,
+    isMobile = false,
+  }: {
+    onNavigate?: () => void;
+    onClose?: () => void;
+    isMobile?: boolean;
+  }) => (
+    <div
+      className={`p-6 h-full flex flex-col border border-dashed border-[#dbe3f5]/60 rounded-3xl ${
+        isMobile ? "bg-[#0B1424]/90 backdrop-blur-2xl" : ""
+      }`}
+    >
+      <div className="mb-8 flex items-center justify-between gap-3">
+        <Link href="/" className="min-w-0" onClick={onNavigate}>
+          <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
+            <Route className="w-5 h-5 md:w-6 md:h-6 text-[#8795B3]" strokeWidth={2.4} />
+            <span className="truncate">Yield Router</span>
+          </h2>
+        </Link>
+        {isMobile && (
+          <button
+            onClick={onClose}
+            aria-label="Close sidebar"
+            className="text-white p-2 rounded-lg border border-[#8795B3]/25 bg-[#0F172B]/60 hover:bg-[#1B273D]/70 transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
+      </div>
 
       <nav className="flex-1 space-y-1">
         {navItems.map((item) => {
@@ -66,8 +94,9 @@ export default function DashboardSidebar() {
   return (
     <>
       {/* Mobile Hamburger Button */}
+      {!isOpen && (
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setIsOpen(true)}
         className="fixed top-4 left-4 z-50 md:hidden p-3 rounded-lg text-white border border-dashed border-[#dbe3f5]/60"
       >
         <svg
@@ -76,23 +105,15 @@ export default function DashboardSidebar() {
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
-          {isOpen ? (
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          ) : (
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          )}
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 6h16M4 12h16M4 18h16"
+          />
         </svg>
       </button>
+      )}
 
       {/* Desktop Sidebar */}
       <aside className="hidden md:block fixed top-0 left-0 h-screen w-64 rounded-r-3xl z-40 p-3">
@@ -107,9 +128,9 @@ export default function DashboardSidebar() {
             animate={{ x: 0 }}
             exit={{ x: -300 }}
             transition={{ duration: 0.3 }}
-            className="fixed top-0 left-0 h-screen w-64 rounded-r-3xl z-40 p-3"
+            className="fixed top-0 left-0 h-dvh min-h-dvh w-64 rounded-r-3xl z-40 p-3"
           >
-            <SidebarContent onNavigate={() => setIsOpen(false)} />
+            <SidebarContent onNavigate={() => setIsOpen(false)} onClose={() => setIsOpen(false)} isMobile />
           </motion.aside>
         )}
       </AnimatePresence>
@@ -121,7 +142,7 @@ export default function DashboardSidebar() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={() => setIsOpen(false)}
-          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          className="fixed inset-0 h-dvh min-h-dvh bg-[#020817]/88 backdrop-blur-xl z-30 md:hidden"
         />
       )}
     </>

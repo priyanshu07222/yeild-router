@@ -54,7 +54,7 @@ export default function HowItWorksSection() {
                 index === 1 ? "md:translate-y-12 lg:translate-y-16" : "md:translate-y-0"
               }`}
             >
-              <div className="glass-card glass-outline rounded-xl p-8 glass-card-hover relative z-10 min-h-[260px]">
+              <div className="glass-card glass-outline rounded-xl p-8 glass-card-hover relative z-10 min-h-[260px] text-center md:text-left">
                 <div className="text-5xl font-bold text-[#8795B3] mb-4 opacity-50">
                   {step.number}
                 </div>
