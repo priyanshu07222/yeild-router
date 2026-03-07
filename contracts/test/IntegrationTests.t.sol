@@ -34,9 +34,9 @@ contract IntegrationTests is Test {
         astarStrategy.setAPY(1000);     // 10%
         hydrationStrategy.setAPY(1500);  // 15%
         
-        strategyManager.addStrategy(address(moonbeamStrategy), 500);
-        strategyManager.addStrategy(address(astarStrategy), 1000);
-        strategyManager.addStrategy(address(hydrationStrategy), 1500);
+        strategyManager.addStrategy(address(moonbeamStrategy), 500, 1284, 2);
+        strategyManager.addStrategy(address(astarStrategy), 1000, 592, 3);
+        strategyManager.addStrategy(address(hydrationStrategy), 1500, 2034, 5);
         
         vault = new Vault(address(asset), address(strategyManager), owner);
 

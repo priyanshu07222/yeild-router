@@ -76,8 +76,8 @@ contract VaultTest is Test {
         astarStrategy.setAPY(1000);  // 10%
         
         // Add strategies to StrategyManager
-        strategyManager.addStrategy(address(moonbeamStrategy), 500);
-        strategyManager.addStrategy(address(astarStrategy), 1000);
+        strategyManager.addStrategy(address(moonbeamStrategy), 500, 1284, 2); // Moonbeam, Low risk
+        strategyManager.addStrategy(address(astarStrategy), 1000, 592, 3); // Astar, Medium risk
         
         // Deploy Vault
         vault = new Vault(address(asset), address(strategyManager), owner);

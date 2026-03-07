@@ -43,8 +43,8 @@ contract YieldSimulationTest is Test {
         astarStrategy.setAPY(1000);    // 10%
         
         // Add strategies
-        strategyManager.addStrategy(address(moonbeamStrategy), 500);
-        strategyManager.addStrategy(address(astarStrategy), 1000);
+        strategyManager.addStrategy(address(moonbeamStrategy), 500, 1284, 2);
+        strategyManager.addStrategy(address(astarStrategy), 1000, 592, 3);
         
         uint256 depositAmount = 100e18;
         
@@ -94,8 +94,8 @@ contract YieldSimulationTest is Test {
         astarStrategy.setAPY(1000);    // 10%
         
         // Add strategies
-        strategyManager.addStrategy(address(moonbeamStrategy), 500);
-        strategyManager.addStrategy(address(astarStrategy), 1000);
+        strategyManager.addStrategy(address(moonbeamStrategy), 500, 1284, 2);
+        strategyManager.addStrategy(address(astarStrategy), 1000, 592, 3);
         
         uint256 depositAmount = 1000e18;
         
@@ -136,8 +136,8 @@ contract YieldSimulationTest is Test {
         astarStrategy.setAPY(1000);    // 10%
         
         // Add strategies
-        strategyManager.addStrategy(address(moonbeamStrategy), 500);
-        strategyManager.addStrategy(address(astarStrategy), 1000);
+        strategyManager.addStrategy(address(moonbeamStrategy), 500, 1284, 2);
+        strategyManager.addStrategy(address(astarStrategy), 1000, 592, 3);
         
         uint256 depositAmount = 1000e18;
         
@@ -204,8 +204,8 @@ contract YieldSimulationTest is Test {
         astarStrategy.setAPY(1000);     // 10%
         
         // Add strategies
-        strategyManager.addStrategy(address(moonbeamStrategy), 500);
-        strategyManager.addStrategy(address(astarStrategy), 1000);
+        strategyManager.addStrategy(address(moonbeamStrategy), 500, 1284, 2);
+        strategyManager.addStrategy(address(astarStrategy), 1000, 592, 3);
         
         uint256 deposit1 = 500e18;
         uint256 deposit2 = 300e18;
@@ -252,7 +252,7 @@ contract YieldSimulationTest is Test {
     function testYieldAccumulation() public {
         // Set APY
         astarStrategy.setAPY(1000); // 10%
-        strategyManager.addStrategy(address(astarStrategy), 1000);
+        strategyManager.addStrategy(address(astarStrategy), 1000, 592, 3);
         
         uint256 depositAmount = 1000e18;
         

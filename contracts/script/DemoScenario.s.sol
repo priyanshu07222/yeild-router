@@ -11,9 +11,9 @@ import {MockERC20} from "../test/Vault.t.sol";
  * @title DemoScenario
  * @notice Demo script for judges showing the complete yield routing flow
  * @dev Demonstrates:
- * 1. User deposits 100 tokens → Astar selected (10% APY)
- * 2. Update Moonbeam APY to 15% → Rebalance → Funds move to Moonbeam
- * 3. User withdraws → Receives 110 tokens (10% yield)
+ * 1. User deposits 100 tokens -> Astar selected (10% APY)
+ * 2. Update Moonbeam APY to 15% -> Rebalance -> Funds move to Moonbeam
+ * 3. User withdraws -> Receives 110 tokens (10% yield)
  */
 contract DemoScenario is Script {
     Vault public vault;
@@ -74,8 +74,8 @@ contract DemoScenario is Script {
         // Add strategies with initial APY
         // Astar: 10% APY (1000 basis points)
         // Moonbeam: 5% APY (500 basis points)
-        strategyManager.addStrategy(address(astarStrategy), 1000);
-        strategyManager.addStrategy(address(moonbeamStrategy), 500);
+        strategyManager.addStrategy(address(astarStrategy), 1000, 592, 3); // Astar: 10% APY, Medium risk
+        strategyManager.addStrategy(address(moonbeamStrategy), 500, 1284, 2); // Moonbeam: 5% APY, Low risk
         
         // Set APY on strategies
         astarStrategy.setAPY(1000);
@@ -84,7 +84,7 @@ contract DemoScenario is Script {
         console.log("\nInitial Strategy Setup:");
         console.log("  Astar Strategy: 10% APY");
         console.log("  Moonbeam Strategy: 5% APY");
-        console.log("  → Astar has higher APY, will be selected\n");
+        console.log("  -> Astar has higher APY, will be selected\n");
     }
 
     function _step1_Deposit() internal {
@@ -107,7 +107,7 @@ contract DemoScenario is Script {
         // User deposits 100 tokens
         vm.prank(user);
         vault.deposit(100e18);
-        console.log("\n✓ User deposited 100 tokens");
+        console.log("\n[OK] User deposited 100 tokens");
 
         // Check which strategy was selected
         address currentStrategy = vault.currentStrategy();
@@ -118,7 +118,7 @@ contract DemoScenario is Script {
         // Verify funds are in Astar strategy
         uint256 astarBalance = asset.balanceOf(address(astarStrategy));
         console.log("\nAstar Strategy Balance:", astarBalance / 1e18, "tokens");
-        console.log("✓ Funds allocated to Astar strategy\n");
+        console.log("[OK] Funds allocated to Astar strategy\n");
     }
 
     function _step2_Rebalance() internal {
@@ -127,7 +127,7 @@ contract DemoScenario is Script {
         // Update Moonbeam APY to 15% (1500 basis points)
         strategyManager.updateAPY(1, 1500); // Strategy ID 1 is Moonbeam
         moonbeamStrategy.setAPY(1500);
-        console.log("✓ Updated Moonbeam APY to 15%");
+        console.log("[OK] Updated Moonbeam APY to 15%");
 
         // Check best strategy
         address bestStrategy = strategyManager.getBestStrategy();
@@ -143,7 +143,7 @@ contract DemoScenario is Script {
 
         // Call rebalance (owner only)
         vault.rebalance();
-        console.log("\n✓ Rebalance called");
+        console.log("\n[OK] Rebalance called");
 
         // Check balances after rebalance
         uint256 astarBalanceAfter = asset.balanceOf(address(astarStrategy));
@@ -157,7 +157,7 @@ contract DemoScenario is Script {
         console.log("\nCurrent Strategy:", currentStrategy);
         console.log("Strategy: Moonbeam");
         console.log("APY: 15%");
-        console.log("✓ Funds moved to Moonbeam\n");
+        console.log("[OK] Funds moved to Moonbeam\n");
     }
 
     function _step3_Withdraw() internal {
@@ -184,12 +184,12 @@ contract DemoScenario is Script {
         uint256 userBalanceAfter = asset.balanceOf(user);
         uint256 received = userBalanceAfter - userBalanceBefore;
 
-        console.log("\n✓ User withdrew all shares");
+        console.log("\n[OK] User withdrew all shares");
         console.log("Tokens Received:", received / 1e18);
         console.log("\nExplanation:");
         console.log("  - Deposited: 100 tokens");
         console.log("  - Yield earned: ~10 tokens (10% APY from Astar)");
         console.log("  - Total received: ~110 tokens");
-        console.log("\n✓ Cross-chain yield routing successful!\n");
+        console.log("\n[OK] Cross-chain yield routing successful!\n");
     }
 }

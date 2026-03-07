@@ -46,7 +46,12 @@ export default function TransactionHistory() {
       transition={{ duration: 0.5 }}
       className="glass-card rounded-2xl p-6 overflow-hidden"
     >
-      <h2 className="text-2xl font-bold text-white mb-6">Transaction History</h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-white">Transaction History</h2>
+        <span className="px-2.5 py-1 text-[10px] sm:text-xs font-medium bg-amber-500/15 text-amber-400 border border-amber-500/30 rounded-full">
+          Demo Data
+        </span>
+      </div>
 
       <div className="overflow-x-auto">
         <table className="w-full">

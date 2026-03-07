@@ -34,21 +34,25 @@ contract StrategyManagerTest is Test {
         uint256 astarAPY = 1000;   // 10%
         
         // Add Moonbeam strategy
-        strategyManager.addStrategy(address(moonbeamStrategy), moonbeamAPY);
+        strategyManager.addStrategy(address(moonbeamStrategy), moonbeamAPY, 1284, 2);
         
         // Verify storage
-        (address strategy, uint256 apy, bool active) = strategyManager.strategies(0);
+        (address strategy, uint256 apy, uint256 chainId, uint256 riskScore, bool active) = strategyManager.strategies(0);
         assertEq(strategy, address(moonbeamStrategy), "Strategy address should match");
         assertEq(apy, moonbeamAPY, "APY should match");
+        assertEq(chainId, 1284, "Chain ID should be Moonbeam");
+        assertEq(riskScore, 2, "Risk score should match");
         assertEq(active, true, "Strategy should be active");
         
         // Add Astar strategy
-        strategyManager.addStrategy(address(astarStrategy), astarAPY);
+        strategyManager.addStrategy(address(astarStrategy), astarAPY, 592, 3);
         
         // Verify second strategy
-        (strategy, apy, active) = strategyManager.strategies(1);
+        (strategy, apy, chainId, riskScore, active) = strategyManager.strategies(1);
         assertEq(strategy, address(astarStrategy), "Second strategy address should match");
         assertEq(apy, astarAPY, "Second APY should match");
+        assertEq(chainId, 592, "Chain ID should be Astar");
+        assertEq(riskScore, 3, "Risk score should match");
         assertEq(active, true, "Second strategy should be active");
         
         // Verify count
@@ -58,17 +62,17 @@ contract StrategyManagerTest is Test {
     function testAddStrategyOnlyOwner() public {
         vm.prank(nonOwner);
         vm.expectRevert();
-        strategyManager.addStrategy(address(moonbeamStrategy), 500);
+        strategyManager.addStrategy(address(moonbeamStrategy), 500, 1284, 2);
     }
 
     function testAddStrategyInvalidAddress() public {
         vm.expectRevert("StrategyManager: invalid strategy address");
-        strategyManager.addStrategy(address(0), 500);
+        strategyManager.addStrategy(address(0), 500, 1284, 2);
     }
 
     function testAddStrategyInvalidAPY() public {
         vm.expectRevert("StrategyManager: APY cannot exceed 100%");
-        strategyManager.addStrategy(address(moonbeamStrategy), 10001);
+        strategyManager.addStrategy(address(moonbeamStrategy), 10001, 1284, 2);
     }
 
     function testUpdateAPY() public {
@@ -76,22 +80,22 @@ contract StrategyManagerTest is Test {
         uint256 newAPY = 800;      // 8%
         
         // Add strategy
-        strategyManager.addStrategy(address(moonbeamStrategy), initialAPY);
+        strategyManager.addStrategy(address(moonbeamStrategy), initialAPY, 1284, 2);
         
         // Verify initial APY
-        (, uint256 apy, ) = strategyManager.strategies(0);
+        (, uint256 apy, , , ) = strategyManager.strategies(0);
         assertEq(apy, initialAPY, "Initial APY should be 5%");
         
         // Update APY
         strategyManager.updateAPY(0, newAPY);
         
         // Verify APY updated
-        (, apy, ) = strategyManager.strategies(0);
+        (, apy, , , ) = strategyManager.strategies(0);
         assertEq(apy, newAPY, "APY should be updated to 8%");
     }
 
     function testUpdateAPYOnlyOwner() public {
-        strategyManager.addStrategy(address(moonbeamStrategy), 500);
+        strategyManager.addStrategy(address(moonbeamStrategy), 500, 1284, 2);
         
         vm.prank(nonOwner);
         vm.expectRevert();
@@ -109,9 +113,9 @@ contract StrategyManagerTest is Test {
         uint256 hydrationAPY = 300;  // 3%
         
         // Add strategies
-        strategyManager.addStrategy(address(moonbeamStrategy), moonbeamAPY);
-        strategyManager.addStrategy(address(astarStrategy), astarAPY);
-        strategyManager.addStrategy(address(hydrationStrategy), hydrationAPY);
+        strategyManager.addStrategy(address(moonbeamStrategy), moonbeamAPY, 1284, 2);
+        strategyManager.addStrategy(address(astarStrategy), astarAPY, 592, 3);
+        strategyManager.addStrategy(address(hydrationStrategy), hydrationAPY, 2034, 5);
         
         // Get best strategy (should be Astar with 10% APY)
         address bestStrategy = strategyManager.getBestStrategy();
@@ -131,8 +135,8 @@ contract StrategyManagerTest is Test {
     }
 
     function testGetBestStrategyNoActiveStrategies() public {
-        strategyManager.addStrategy(address(moonbeamStrategy), 500);
-        strategyManager.addStrategy(address(astarStrategy), 1000);
+        strategyManager.addStrategy(address(moonbeamStrategy), 500, 1284, 2);
+        strategyManager.addStrategy(address(astarStrategy), 1000, 592, 3);
         
         // Deactivate all strategies
         strategyManager.deactivateStrategy(0);
@@ -143,23 +147,23 @@ contract StrategyManagerTest is Test {
     }
 
     function testDeactivateStrategy() public {
-        strategyManager.addStrategy(address(moonbeamStrategy), 500);
+        strategyManager.addStrategy(address(moonbeamStrategy), 500, 1284, 2);
         
         // Verify active
-        (, , bool active) = strategyManager.strategies(0);
+        (, , , , bool active) = strategyManager.strategies(0);
         assertEq(active, true, "Strategy should be active");
         
         // Deactivate
         strategyManager.deactivateStrategy(0);
         
         // Verify deactivated
-        (, , active) = strategyManager.strategies(0);
+        (, , , , active) = strategyManager.strategies(0);
         assertEq(active, false, "Strategy should be deactivated");
     }
 
     function testGetStrategy() public {
         uint256 moonbeamAPY = 500;
-        strategyManager.addStrategy(address(moonbeamStrategy), moonbeamAPY);
+        strategyManager.addStrategy(address(moonbeamStrategy), moonbeamAPY, 1284, 2);
         
         StrategyManager.Strategy memory strategy = strategyManager.getStrategy(0);
         assertEq(strategy.strategy, address(moonbeamStrategy), "Strategy address should match");

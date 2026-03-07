@@ -8,9 +8,12 @@ export default function Footer() {
       <div className="container mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           <div>
-            <h3 className="text-xl font-bold text-white mb-4">Yield Router</h3>
-            <p className="text-[#8795B3] text-sm">
-              Cross-chain yield optimization on Polkadot
+            <h3 className="text-xl font-bold text-white mb-4">ParaX</h3>
+            <p className="text-[#8795B3] text-sm mb-2">
+              Cross-Chain Yield Router for Polkadot
+            </p>
+            <p className="text-[#8795B3]/70 text-xs">
+              Risk-aware DeFi optimization • Built with Foundry
             </p>
           </div>
           
@@ -57,7 +60,7 @@ export default function Footer() {
         
         <div className="pt-8 border-t border-white/10 text-center">
           <p className="text-[#8795B3] text-sm">
-            © 2026 Yield Router. All rights reserved.
+            © 2026 ParaX. All rights reserved.
           </p>
         </div>
       </div>

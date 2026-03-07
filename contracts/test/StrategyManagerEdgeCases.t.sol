@@ -32,7 +32,7 @@ contract StrategyManagerEdgeCasesTest is Test {
         for (uint256 i = 0; i < 10; i++) {
             MockStrategy newStrategy = new MockStrategy(address(asset));
             newStrategy.setAPY(uint256(500 + i * 100)); // Different APYs
-            strategyManager.addStrategy(address(newStrategy), uint256(500 + i * 100));
+            strategyManager.addStrategy(address(newStrategy), uint256(500 + i * 100), 1284 + i, 2 + (i % 9));
         }
         
         assertEq(strategyManager.getStrategyCount(), 10, "Should have 10 strategies");
@@ -43,7 +43,7 @@ contract StrategyManagerEdgeCasesTest is Test {
     }
 
     function testUpdateAPYToZero() public {
-        strategyManager.addStrategy(address(strategy1), 1000);
+        strategyManager.addStrategy(address(strategy1), 1000, 1284, 3);
         
         strategyManager.updateAPY(0, 0); // Update strategy at index 0
         
@@ -52,7 +52,7 @@ contract StrategyManagerEdgeCasesTest is Test {
     }
 
     function testUpdateAPYToMaximum() public {
-        strategyManager.addStrategy(address(strategy1), 1000);
+        strategyManager.addStrategy(address(strategy1), 1000, 1284, 3);
         
         strategyManager.updateAPY(0, 10000); // 100%, strategy at index 0
         
@@ -61,8 +61,8 @@ contract StrategyManagerEdgeCasesTest is Test {
     }
 
     function testDeactivateAndReactivateStrategy() public {
-        strategyManager.addStrategy(address(strategy1), 1000);
-        strategyManager.addStrategy(address(strategy2), 500);
+        strategyManager.addStrategy(address(strategy1), 1000, 1284, 3);
+        strategyManager.addStrategy(address(strategy2), 500, 592, 2);
         
         // Deactivate strategy1 (using index 0)
         strategyManager.deactivateStrategy(0);
@@ -73,8 +73,8 @@ contract StrategyManagerEdgeCasesTest is Test {
     }
 
     function testGetBestStrategyWithTies() public {
-        strategyManager.addStrategy(address(strategy1), 1000);
-        strategyManager.addStrategy(address(strategy2), 1000); // Same APY
+        strategyManager.addStrategy(address(strategy1), 1000, 1284, 3);
+        strategyManager.addStrategy(address(strategy2), 1000, 592, 4); // Same APY and risk
         
         // Should return one of them (implementation dependent)
         address bestStrategy = strategyManager.getBestStrategy();
@@ -85,7 +85,7 @@ contract StrategyManagerEdgeCasesTest is Test {
     }
 
     function testUpdateAPYMultipleTimes() public {
-        strategyManager.addStrategy(address(strategy1), 500);
+        strategyManager.addStrategy(address(strategy1), 500, 1284, 2);
         
         strategyManager.updateAPY(0, 1000); // Update strategy at index 0
         StrategyManager.Strategy memory strategy = strategyManager.getStrategy(0);
@@ -101,7 +101,7 @@ contract StrategyManagerEdgeCasesTest is Test {
     }
 
     function testAddStrategyWithZeroAPY() public {
-        strategyManager.addStrategy(address(strategy1), 0);
+        strategyManager.addStrategy(address(strategy1), 0, 1284, 1);
         
         StrategyManager.Strategy memory strategy = strategyManager.getStrategy(0);
         assertEq(strategy.apy, 0, "Should allow zero APY");
@@ -111,19 +111,19 @@ contract StrategyManagerEdgeCasesTest is Test {
     function testGetStrategyCount() public {
         assertEq(strategyManager.getStrategyCount(), 0, "Initial count should be 0");
         
-        strategyManager.addStrategy(address(strategy1), 500);
+        strategyManager.addStrategy(address(strategy1), 500, 1284, 2);
         assertEq(strategyManager.getStrategyCount(), 1, "Count should be 1");
         
-        strategyManager.addStrategy(address(strategy2), 1000);
+        strategyManager.addStrategy(address(strategy2), 1000, 592, 4);
         assertEq(strategyManager.getStrategyCount(), 2, "Count should be 2");
         
-        strategyManager.addStrategy(address(strategy3), 1500);
+        strategyManager.addStrategy(address(strategy3), 1500, 2034, 5);
         assertEq(strategyManager.getStrategyCount(), 3, "Count should be 3");
     }
 
     function testBestStrategyChangesAfterAPYUpdate() public {
-        strategyManager.addStrategy(address(strategy1), 500);
-        strategyManager.addStrategy(address(strategy2), 1000);
+        strategyManager.addStrategy(address(strategy1), 500, 1284, 2);
+        strategyManager.addStrategy(address(strategy2), 1000, 592, 4);
         
         // Strategy2 should be best initially
         assertEq(strategyManager.getBestStrategy(), address(strategy2), "Strategy2 should be best");
@@ -136,8 +136,8 @@ contract StrategyManagerEdgeCasesTest is Test {
     }
 
     function testDeactivateAllStrategies() public {
-        strategyManager.addStrategy(address(strategy1), 500);
-        strategyManager.addStrategy(address(strategy2), 1000);
+        strategyManager.addStrategy(address(strategy1), 500, 1284, 2);
+        strategyManager.addStrategy(address(strategy2), 1000, 592, 4);
         
         // Deactivate all (using indices 0 and 1)
         strategyManager.deactivateStrategy(0);
@@ -149,12 +149,12 @@ contract StrategyManagerEdgeCasesTest is Test {
     }
 
     function testAddDuplicateStrategy() public {
-        strategyManager.addStrategy(address(strategy1), 500);
+        strategyManager.addStrategy(address(strategy1), 500, 1284, 2);
         
         // StrategyManager allows adding the same strategy address multiple times
         // (This is a design choice - strategies are identified by index, not address)
         // So we test that it's allowed
-        strategyManager.addStrategy(address(strategy1), 1000);
+        strategyManager.addStrategy(address(strategy1), 1000, 1284, 3);
         
         assertEq(strategyManager.getStrategyCount(), 2, "Should have 2 strategies");
         assertEq(strategyManager.getStrategy(0).strategy, address(strategy1), "First strategy should match");
@@ -172,9 +172,9 @@ contract StrategyManagerEdgeCasesTest is Test {
     }
 
     function testGetStrategyByIndex() public {
-        strategyManager.addStrategy(address(strategy1), 500);
-        strategyManager.addStrategy(address(strategy2), 1000);
-        strategyManager.addStrategy(address(strategy3), 1500);
+        strategyManager.addStrategy(address(strategy1), 500, 1284, 2);
+        strategyManager.addStrategy(address(strategy2), 1000, 592, 4);
+        strategyManager.addStrategy(address(strategy3), 1500, 2034, 5);
         
         StrategyManager.Strategy memory s1 = strategyManager.getStrategy(0);
         StrategyManager.Strategy memory s2 = strategyManager.getStrategy(1);
@@ -186,15 +186,15 @@ contract StrategyManagerEdgeCasesTest is Test {
     }
 
     function testBestStrategyWithSingleStrategy() public {
-        strategyManager.addStrategy(address(strategy1), 500);
+        strategyManager.addStrategy(address(strategy1), 500, 1284, 2);
         
         address bestStrategy = strategyManager.getBestStrategy();
         assertEq(bestStrategy, address(strategy1), "Single strategy should be best");
     }
 
     function testAPYBoundaryValues() public {
-        strategyManager.addStrategy(address(strategy1), 1); // Minimum
-        strategyManager.addStrategy(address(strategy2), 10000); // Maximum
+        strategyManager.addStrategy(address(strategy1), 1, 1284, 1); // Minimum APY, Minimum risk
+        strategyManager.addStrategy(address(strategy2), 10000, 592, 10); // Maximum APY, Maximum risk
         
         StrategyManager.Strategy memory s1 = strategyManager.getStrategy(0);
         StrategyManager.Strategy memory s2 = strategyManager.getStrategy(1);

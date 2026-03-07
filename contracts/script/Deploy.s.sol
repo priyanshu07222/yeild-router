@@ -40,8 +40,12 @@ contract DeployScript is Script {
         // Optional: Add MockStrategy to StrategyManager with an APY
         console.log("\n4. Adding MockStrategy to StrategyManager...");
         uint256 mockStrategyAPY = vm.envOr("MOCK_STRATEGY_APY", uint256(500)); // Default 5% (500 basis points)
-        strategyManager.addStrategy(address(mockStrategy), mockStrategyAPY);
+        uint256 mockStrategyChainId = vm.envOr("MOCK_STRATEGY_CHAIN_ID", uint256(1284)); // Default Moonbeam
+        uint256 mockStrategyRisk = vm.envOr("MOCK_STRATEGY_RISK", uint256(2)); // Default low-medium risk
+        strategyManager.addStrategy(address(mockStrategy), mockStrategyAPY, mockStrategyChainId, mockStrategyRisk);
         console.log("MockStrategy added with APY:", mockStrategyAPY);
+        console.log("Chain ID:", mockStrategyChainId);
+        console.log("Risk Score:", mockStrategyRisk);
 
         console.log("\n=== Deployment Summary ===");
         console.log("StrategyManager:", address(strategyManager));

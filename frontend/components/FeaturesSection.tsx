@@ -5,22 +5,22 @@ import { motion, useScroll, useTransform } from "framer-motion";
 
 const features = [
   {
+    icon: "🌐",
+    title: "Cross-Chain Routing",
+    description:
+      "Deploy capital across Moonbeam, Astar, and Hydration parachains. XCM-ready architecture enables seamless cross-chain asset allocation.",
+  },
+  {
     icon: "⚡",
     title: "Auto Rebalancing",
     description:
-      "Automatically rebalances your assets to the highest-yielding strategy every 10 minutes, ensuring maximum returns.",
+      "Automated bot monitors APY across all strategies every 10 minutes. Funds automatically migrate to optimal opportunities on-chain.",
   },
   {
-    icon: "🌐",
-    title: "Cross-Chain Strategies",
+    icon: "🛡️",
+    title: "Risk-Aware Optimization",
     description:
-      "Access yield opportunities across multiple Polkadot parachains including Moonbeam, Astar, and Hydration.",
-  },
-  {
-    icon: "📈",
-    title: "Maximum Yield Optimization",
-    description:
-      "Our algorithm continuously monitors APY across all strategies and routes funds to maximize your returns.",
+      "Score-based algorithm balances yield against risk (APY - risk×100). Prioritizes safer strategies unless yield differential justifies risk.",
   },
 ];
 

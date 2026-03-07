@@ -15,8 +15,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Yield Router - Cross-Chain Yield Optimization on Polkadot",
-  description: "Automatically route your assets to the highest yield strategy across parachains",
+  title: "ParaX - Cross-Chain Yield Router for Polkadot",
+  description: "Automatically allocate your assets to the highest-yield strategies across Polkadot parachains with risk-aware optimization",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({

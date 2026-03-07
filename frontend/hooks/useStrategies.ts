@@ -11,6 +11,8 @@ const STRATEGY_MANAGER_ADDRESS = process.env.NEXT_PUBLIC_STRATEGY_MANAGER_ADDRES
 export interface Strategy {
   address: string;
   apy: number; // APY in basis points (e.g., 500 = 5%)
+  chainId: number; // Chain ID (e.g., Moonbeam=1284, Astar=592)
+  riskScore: number; // Risk score from 1 (lowest) to 10 (highest)
   active: boolean;
 }
 
@@ -57,6 +59,8 @@ export function useStrategies() {
             }).then((result: any) => ({
               address: result.strategy as string,
               apy: Number(result.apy),
+              chainId: Number(result.chainId),
+              riskScore: Number(result.riskScore),
               active: result.active as boolean,
             }))
           );

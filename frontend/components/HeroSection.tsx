@@ -16,13 +16,13 @@ export default function HeroSection() {
           transition={{ duration: 0.8 }}
         >
           <h1 className="landing-heading text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl mb-4 sm:mb-6 leading-tight px-2">
-            Cross-Chain Yield
-            <br />
             <span className="bg-gradient-to-r from-[#8795B3] to-[#3A404D] bg-clip-text text-transparent">
-              Optimization
+              Cross-Chain
             </span>
             <br />
-            on Polkadot
+            Yield Router
+            <br />
+            for Polkadot
           </h1>
           
           <motion.p
@@ -31,7 +31,7 @@ export default function HeroSection() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="landing-subtext text-base sm:text-lg md:text-xl lg:text-2xl mb-8 sm:mb-10 md:mb-12 max-w-xs sm:max-w-md md:max-w-2xl lg:max-w-3xl mx-auto px-4"
           >
-            Automatically route your assets to the highest yield strategy across parachains.
+            Automatically allocate your assets to the highest-yield strategies across Polkadot parachains with risk-aware optimization.
           </motion.p>
 
           <motion.div

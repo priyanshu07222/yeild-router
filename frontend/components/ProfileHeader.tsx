@@ -2,34 +2,73 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useAccount } from "wagmi";
+import { useAccount, useReadContract } from "wagmi";
 import { formatEther } from "viem";
 import { useVault } from "@/hooks/useVault";
+import vaultABI from "@/contracts/abi.json";
+
+const VAULT_ADDRESS = process.env.NEXT_PUBLIC_VAULT_ADDRESS || "0x0000000000000000000000000000000000000000";
 
 export default function ProfileHeader() {
   const { address, isConnected } = useAccount();
-  const { totalAssets, userShares } = useVault();
+  const { userShares } = useVault();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  // Read total shares from contract
+  const { data: totalShares } = useReadContract({
+    address: VAULT_ADDRESS as `0x${string}`,
+    abi: vaultABI,
+    functionName: "totalShares",
+  });
+
+  // Read total assets from contract
+  const { data: totalAssets } = useReadContract({
+    address: VAULT_ADDRESS as `0x${string}`,
+    abi: vaultABI,
+    functionName: "totalAssets",
+  });
+
+  // Read current strategy
+  const { data: currentStrategy } = useReadContract({
+    address: VAULT_ADDRESS as `0x${string}`,
+    abi: vaultABI,
+    functionName: "currentStrategy",
+  });
+
   const formatAddress = (addr: string | undefined) => {
     if (!addr) return "Not Connected";
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
   };
 
-  const formatValue = (value: bigint | null) => {
+  const formatValue = (value: bigint | null | undefined) => {
     if (!value) return "0.00";
     return (Number(value) / 1e18).toFixed(2);
   };
 
-  // Mock data for total yield (in production, calculate from transaction history)
-  const totalYield = totalAssets && userShares
-    ? Number(totalAssets) - Number(userShares)
-    : 0;
-  const totalYieldFormatted = totalYield > 0 ? (totalYield / 1e18).toFixed(2) : "0.00";
+  // Calculate user's vault value: (userShares / totalShares) * totalAssets
+  const calculateUserValue = (): string => {
+    if (!userShares || !totalShares || !totalAssets) return "0.00";
+    if (Number(totalShares) === 0) return "0.00";
+    
+    const userSharesNum = Number(userShares);
+    const totalSharesNum = Number(totalShares);
+    const totalAssetsNum = Number(totalAssets);
+    
+    const userValue = (userSharesNum / totalSharesNum) * totalAssetsNum;
+    return (userValue / 1e18).toFixed(2);
+  };
+
+  // Calculate estimated yield (userValue - userShares, rough approximation)
+  const calculateEstimatedYield = (): string => {
+    const userValue = parseFloat(calculateUserValue());
+    const sharesValue = parseFloat(formatValue(userShares));
+    const yieldValue = userValue - sharesValue;
+    return yieldValue > 0 ? yieldValue.toFixed(2) : "0.00";
+  };
 
   return (
     <motion.div
@@ -53,33 +92,46 @@ export default function ProfileHeader() {
             {mounted ? formatAddress(address) : "Not Connected"}
           </p>
 
-          {/* Stats Grid */}
+          {/* Stats Grid - Real Data */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
-              <p className="text-[#8795B3] text-sm mb-1">Total Deposited</p>
-              <p className="text-xl font-bold text-white">
-                ${formatValue(userShares)}
-              </p>
-            </div>
-            <div>
-              <p className="text-[#8795B3] text-sm mb-1">Total Yield</p>
-              <p className="text-xl font-bold text-[#8795B3]">
-                +${totalYieldFormatted}
-              </p>
-            </div>
-            <div>
-              <p className="text-[#8795B3] text-sm mb-1">Vault Shares</p>
-              <p className="text-xl font-bold text-white">
+              <p className="text-[#8795B3] text-xs sm:text-sm mb-1">Vault Shares</p>
+              <p className="text-lg sm:text-xl font-bold text-white">
                 {formatValue(userShares)}
               </p>
             </div>
             <div>
-              <p className="text-[#8795B3] text-sm mb-1">Current Value</p>
-              <p className="text-xl font-bold text-white">
+              <p className="text-[#8795B3] text-xs sm:text-sm mb-1">Your Vault Value</p>
+              <p className="text-lg sm:text-xl font-bold text-[#8795B3]">
+                ${calculateUserValue()}
+              </p>
+              <p className="text-[10px] sm:text-xs text-[#8795B3]/60 mt-0.5">Real-time</p>
+            </div>
+            <div>
+              <p className="text-[#8795B3] text-xs sm:text-sm mb-1">Est. Yield</p>
+              <p className="text-lg sm:text-xl font-bold text-emerald-400">
+                +${calculateEstimatedYield()}
+              </p>
+              <p className="text-[10px] sm:text-xs text-[#8795B3]/60 mt-0.5">Approx</p>
+            </div>
+            <div>
+              <p className="text-[#8795B3] text-xs sm:text-sm mb-1">Total TVL</p>
+              <p className="text-lg sm:text-xl font-bold text-white">
                 ${formatValue(totalAssets)}
               </p>
+              <p className="text-[10px] sm:text-xs text-[#8795B3]/60 mt-0.5">Real-time</p>
             </div>
           </div>
+
+          {/* Current Strategy Info */}
+          {mounted && currentStrategy && currentStrategy !== "0x0000000000000000000000000000000000000000" && (
+            <div className="mt-4 pt-4 border-t border-[#8795B3]/20">
+              <p className="text-xs sm:text-sm text-[#8795B3] mb-1">Current Strategy</p>
+              <p className="text-xs sm:text-sm font-mono text-white">
+                {formatAddress(currentStrategy as string)}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </motion.div>

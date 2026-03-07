@@ -34,9 +34,9 @@ contract VaultEdgeCasesTest is Test {
         strategy2.setAPY(1000); // 10%
         strategy3.setAPY(1500); // 15%
         
-        strategyManager.addStrategy(address(strategy1), 500);
-        strategyManager.addStrategy(address(strategy2), 1000);
-        strategyManager.addStrategy(address(strategy3), 1500);
+        strategyManager.addStrategy(address(strategy1), 500, 1284, 2);
+        strategyManager.addStrategy(address(strategy2), 1000, 592, 3);
+        strategyManager.addStrategy(address(strategy3), 1500, 2034, 5);
         
         vault = new Vault(address(asset), address(strategyManager), owner);
 

@@ -45,7 +45,7 @@ export default function LandingNavbar() {
           {/* Logo */}
           <Link href="/dashboard" className="flex items-center gap-2.5 flex-shrink-0 z-20">
             <Route className="h-6 w-6 text-[#8795B3]" strokeWidth={2.4} />
-            <div className="text-2xl font-bold text-white">Yield Router</div>
+            <div className="text-2xl font-bold text-white">ParaX</div>
           </Link>
 
           {/* Desktop Navigation - with max-width constraint */}
@@ -145,7 +145,7 @@ export default function LandingNavbar() {
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <Route className="h-6 w-6 text-[#8795B3]" strokeWidth={2.4} />
-                  <span className="text-2xl font-bold text-white">Yield Router</span>
+                  <span className="text-2xl font-bold text-white">ParaX</span>
                 </Link>
 
               </div>

@@ -5,21 +5,21 @@ import { motion } from "framer-motion";
 const steps = [
   {
     number: "01",
-    title: "Deposit Assets",
+    title: "Deposit ERC20 Assets",
     description:
-      "Deposit your assets into the Yield Router vault. We support multiple ERC20 tokens.",
+      "Transfer tokens to the Vault contract. Receive proportional shares representing your vault ownership. First deposit establishes 1:1 share ratio.",
   },
   {
     number: "02",
-    title: "Router Finds Best Strategy",
+    title: "Risk-Adjusted Routing",
       description:
-        "Our smart contract automatically identifies the strategy with the highest APY across all available parachains.",
+        "Smart contract calculates risk-adjusted scores (APY - risk×100) for all parachain strategies. Funds allocate to optimal strategy across Moonbeam, Astar, or Hydration.",
   },
   {
     number: "03",
-    title: "Auto Rebalance for Highest Yield",
+    title: "Automated Rebalancing",
     description:
-      "The auto-rebalance bot continuously monitors APY and moves your funds to maximize returns.",
+      "Cron job monitors strategy scores every 10 minutes. When a better opportunity emerges, funds migrate on-chain automatically. Zero user intervention required.",
   },
 ];
 

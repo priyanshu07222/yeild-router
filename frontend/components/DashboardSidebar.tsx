@@ -53,7 +53,7 @@ export default function DashboardSidebar() {
         <Link href="/landing" className="min-w-0" onClick={onNavigate}>
           <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
             <Route className="w-5 h-5 md:w-6 md:h-6 text-[#8795B3]" strokeWidth={2.4} />
-            <span className="truncate">Yield Router</span>
+            <span className="truncate">ParaX</span>
           </h2>
         </Link>
         {isMobile && (

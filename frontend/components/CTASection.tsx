@@ -21,7 +21,7 @@ export default function CTASection() {
             transition={{ duration: 0.6 }}
             className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-4 sm:mb-6 px-2"
           >
-            Start Earning Passive Yield
+            Deploy Your Yield Strategy
           </motion.h2>
           
           <motion.p
@@ -31,7 +31,7 @@ export default function CTASection() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-base sm:text-lg md:text-xl lg:text-2xl text-[#8795B3] mb-6 sm:mb-8 max-w-xs sm:max-w-md md:max-w-2xl mx-auto px-4"
           >
-            Join thousands of users earning maximum yield across the Polkadot ecosystem
+            Smart contract-based yield optimization with automated cross-chain rebalancing. Built on Foundry with comprehensive test coverage.
           </motion.p>
 
           <motion.div

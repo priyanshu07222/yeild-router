@@ -52,7 +52,7 @@ export default function DashboardPreview() {
     <section ref={sectionRef} className="landing-section">
       <div className="container mx-auto">
         <h2 className="landing-heading text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-6 sm:mb-8 text-center px-4">
-          Dashboard Preview
+          Live Vault Metrics
         </h2>
 
         <motion.div

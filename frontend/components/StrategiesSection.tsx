@@ -74,10 +74,10 @@ export default function StrategiesSection() {
           className="text-center mb-8 sm:mb-10 md:mb-12 px-4"
         >
           <h2 className="landing-heading text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-3 sm:mb-4">
-            Available Strategies
+            Multi-Chain Strategies
           </h2>
           <p className="landing-subtext text-base sm:text-lg md:text-xl max-w-xs sm:max-w-md md:max-w-2xl mx-auto">
-            Choose from multiple yield strategies across Polkadot parachains
+            Access DeFi yield opportunities across Polkadot parachains. Risk scores range from 1 (safest) to 10 (highest risk).
           </p>
         </motion.div>
 
