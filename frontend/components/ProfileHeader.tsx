@@ -9,6 +9,23 @@ import vaultABI from "@/contracts/abi.json";
 
 const VAULT_ADDRESS = process.env.NEXT_PUBLIC_VAULT_ADDRESS || "0x0000000000000000000000000000000000000000";
 
+// Helper to safely convert unknown to bigint
+const toBigIntSafe = (value: unknown): bigint | null => {
+  if (value === null || value === undefined) return null;
+  if (typeof value === "bigint") return value;
+  if (typeof value === "number") return BigInt(value);
+  if (typeof value === "string") return BigInt(value);
+  return null;
+};
+
+// Helper to safely convert unknown to string (for addresses)
+const toStringSafe = (value: unknown): string | null => {
+  if (value === null || value === undefined) return null;
+  if (typeof value === "string") return value;
+  if (typeof value === "bigint") return value.toString();
+  return null;
+};
+
 export default function ProfileHeader() {
   const { address, isConnected } = useAccount();
   const { userShares } = useVault();
@@ -49,14 +66,19 @@ export default function ProfileHeader() {
     return (Number(value) / 1e18).toFixed(2);
   };
 
+  // Convert contract responses to proper types
+  const totalSharesBigInt = toBigIntSafe(totalShares);
+  const totalAssetsBigInt = toBigIntSafe(totalAssets);
+  const currentStrategyStr = toStringSafe(currentStrategy);
+
   // Calculate user's vault value: (userShares / totalShares) * totalAssets
   const calculateUserValue = (): string => {
-    if (!userShares || !totalShares || !totalAssets) return "0.00";
-    if (Number(totalShares) === 0) return "0.00";
+    if (!userShares || !totalSharesBigInt || !totalAssetsBigInt) return "0.00";
+    if (Number(totalSharesBigInt) === 0) return "0.00";
     
     const userSharesNum = Number(userShares);
-    const totalSharesNum = Number(totalShares);
-    const totalAssetsNum = Number(totalAssets);
+    const totalSharesNum = Number(totalSharesBigInt);
+    const totalAssetsNum = Number(totalAssetsBigInt);
     
     const userValue = (userSharesNum / totalSharesNum) * totalAssetsNum;
     return (userValue / 1e18).toFixed(2);
@@ -117,18 +139,18 @@ export default function ProfileHeader() {
             <div>
               <p className="text-[#8795B3] text-xs sm:text-sm mb-1">Total TVL</p>
               <p className="text-lg sm:text-xl font-bold text-white">
-                ${formatValue(totalAssets)}
+                ${formatValue(totalAssetsBigInt)}
               </p>
               <p className="text-[10px] sm:text-xs text-[#8795B3]/60 mt-0.5">Real-time</p>
             </div>
           </div>
 
           {/* Current Strategy Info */}
-          {mounted && currentStrategy && currentStrategy !== "0x0000000000000000000000000000000000000000" && (
+          {mounted && currentStrategyStr && currentStrategyStr !== "0x0000000000000000000000000000000000000000" && (
             <div className="mt-4 pt-4 border-t border-[#8795B3]/20">
               <p className="text-xs sm:text-sm text-[#8795B3] mb-1">Current Strategy</p>
               <p className="text-xs sm:text-sm font-mono text-white">
-                {formatAddress(currentStrategy as string)}
+                {formatAddress(currentStrategyStr)}
               </p>
             </div>
           )}

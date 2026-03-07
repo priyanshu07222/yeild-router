@@ -9,6 +9,15 @@ import strategyManagerABI from "@/contracts/strategyManagerABI.json";
 const VAULT_ADDRESS = process.env.NEXT_PUBLIC_VAULT_ADDRESS || "0x0000000000000000000000000000000000000000";
 const STRATEGY_MANAGER_ADDRESS = process.env.NEXT_PUBLIC_STRATEGY_MANAGER_ADDRESS || "0x0000000000000000000000000000000000000000";
 
+// Helper to safely convert unknown to bigint
+const toBigIntSafe = (value: unknown): bigint | null => {
+  if (value === null || value === undefined) return null;
+  if (typeof value === "bigint") return value;
+  if (typeof value === "number") return BigInt(value);
+  if (typeof value === "string") return BigInt(value);
+  return null;
+};
+
 export default function PortfolioStats() {
   const { userShares } = useVault();
 
@@ -38,14 +47,18 @@ export default function PortfolioStats() {
     return (Number(value) / 1e18).toFixed(2);
   };
 
+  // Convert contract responses to bigint
+  const totalSharesBigInt = toBigIntSafe(totalShares);
+  const totalAssetsBigInt = toBigIntSafe(totalAssets);
+
   // Calculate user's vault value: (userShares / totalShares) * totalAssets
   const calculateUserValue = (): string => {
-    if (!userShares || !totalShares || !totalAssets) return "0.00";
-    if (Number(totalShares) === 0) return "0.00";
+    if (!userShares || !totalSharesBigInt || !totalAssetsBigInt) return "0.00";
+    if (Number(totalSharesBigInt) === 0) return "0.00";
     
     const userSharesNum = Number(userShares);
-    const totalSharesNum = Number(totalShares);
-    const totalAssetsNum = Number(totalAssets);
+    const totalSharesNum = Number(totalSharesBigInt);
+    const totalAssetsNum = Number(totalAssetsBigInt);
     
     const userValue = (userSharesNum / totalSharesNum) * totalAssetsNum;
     return (userValue / 1e18).toFixed(2);
@@ -87,7 +100,7 @@ export default function PortfolioStats() {
     },
     {
       label: "Total TVL",
-      value: `$${formatValue(totalAssets)}`,
+      value: `$${formatValue(totalAssetsBigInt)}`,
       icon: "📊",
       color: "text-white",
       badge: "Real-time",
