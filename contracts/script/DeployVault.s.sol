@@ -8,11 +8,14 @@ import {Vault} from "../src/Vault.sol";
 
 /**
  * @title DeployVault
- * @notice Deployment script for Vault, StrategyManager, and MockStrategy contracts
+ * @notice Deployment script for Vault, StrategyManager, and multiple MockStrategy contracts
+ * @dev Deploys 3 strategies representing different Polkadot parachains
  */
 contract DeployVault is Script {
     StrategyManager public strategyManager;
-    MockStrategy public mockStrategy;
+    MockStrategy public moonbeamStrategy;
+    MockStrategy public astarStrategy;
+    MockStrategy public hydrationStrategy;
     Vault public vault;
 
     function run() public {
@@ -31,31 +34,67 @@ contract DeployVault is Script {
         strategyManager = new StrategyManager(owner);
         console.log("StrategyManager deployed at:", address(strategyManager));
 
-        // Deploy MockStrategy
-        console.log("\n2. Deploying MockStrategy...");
-        mockStrategy = new MockStrategy(assetAddress);
-        console.log("MockStrategy deployed at:", address(mockStrategy));
+        // Deploy multiple MockStrategies (representing different parachains)
+        console.log("\n2. Deploying MockStrategies...");
+        
+        moonbeamStrategy = new MockStrategy(assetAddress);
+        console.log("Moonbeam Strategy:", address(moonbeamStrategy));
+        
+        astarStrategy = new MockStrategy(assetAddress);
+        console.log("Astar Strategy:", address(astarStrategy));
+        
+        hydrationStrategy = new MockStrategy(assetAddress);
+        console.log("Hydration Strategy:", address(hydrationStrategy));
 
         // Deploy Vault
         console.log("\n3. Deploying Vault...");
         vault = new Vault(assetAddress, address(strategyManager), owner);
         console.log("Vault deployed at:", address(vault));
 
-        // Optional: Add MockStrategy to StrategyManager with an APY
-        console.log("\n4. Adding MockStrategy to StrategyManager...");
-        uint256 mockStrategyAPY = vm.envOr("MOCK_STRATEGY_APY", uint256(500)); // Default 5% (500 basis points)
-        uint256 mockStrategyChainId = vm.envOr("MOCK_STRATEGY_CHAIN_ID", uint256(1284)); // Default Moonbeam
-        uint256 mockStrategyRisk = vm.envOr("MOCK_STRATEGY_RISK", uint256(2)); // Default low-medium risk
-        strategyManager.addStrategy(address(mockStrategy), mockStrategyAPY, mockStrategyChainId, mockStrategyRisk);
-        console.log("MockStrategy added with APY:", mockStrategyAPY);
-        console.log("Chain ID:", mockStrategyChainId);
-        console.log("Risk Score:", mockStrategyRisk);
+        // Add strategies to StrategyManager with different APYs and risk scores
+        console.log("\n4. Adding strategies to StrategyManager...");
+        
+        // Moonbeam: 8% APY (800 basis points), Low risk (2), Chain ID 1284
+        strategyManager.addStrategy(address(moonbeamStrategy), 800, 1284, 2);
+        moonbeamStrategy.setAPY(800);
+        console.log("Moonbeam Strategy added:");
+        console.log("  APY: 8% (800 bp)");
+        console.log("  Chain ID: 1284");
+        console.log("  Risk Score: 2 (Low)");
+        console.log("  Score: 800 - (2 * 100) = 600");
+        
+        // Astar: 12% APY (1200 basis points), Medium risk (4), Chain ID 592
+        strategyManager.addStrategy(address(astarStrategy), 1200, 592, 4);
+        astarStrategy.setAPY(1200);
+        console.log("\nAstar Strategy added:");
+        console.log("  APY: 12% (1200 bp)");
+        console.log("  Chain ID: 592");
+        console.log("  Risk Score: 4 (Medium)");
+        console.log("  Score: 1200 - (4 * 100) = 800");
+        
+        // Hydration: 15% APY (1500 basis points), High risk (7), Chain ID 2034
+        strategyManager.addStrategy(address(hydrationStrategy), 1500, 2034, 7);
+        hydrationStrategy.setAPY(1500);
+        console.log("\nHydration Strategy added:");
+        console.log("  APY: 15% (1500 bp)");
+        console.log("  Chain ID: 2034");
+        console.log("  Risk Score: 7 (High)");
+        console.log("  Score: 1500 - (7 * 100) = 800");
+        
+        // Check best strategy
+        address bestStrategy = strategyManager.getBestStrategy();
+        console.log("\nBest Strategy (highest score):", bestStrategy);
+        console.log("Note: Astar and Hydration tie at 800, but Astar is added first");
 
         console.log("\n=== Deployment Summary ===");
         console.log("StrategyManager:", address(strategyManager));
-        console.log("MockStrategy:", address(mockStrategy));
+        console.log("Moonbeam Strategy:", address(moonbeamStrategy));
+        console.log("Astar Strategy:", address(astarStrategy));
+        console.log("Hydration Strategy:", address(hydrationStrategy));
         console.log("Vault:", address(vault));
         console.log("Asset:", assetAddress);
+        console.log("\nTotal Strategies: 3");
+        console.log("All strategies are active and ready for routing!");
 
         vm.stopBroadcast();
     }

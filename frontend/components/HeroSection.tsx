@@ -48,7 +48,7 @@ export default function HeroSection() {
             </Link>
             <Link
               href="/strategies"
-              className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 min-w-[220px] sm:min-w-[260px] text-center rounded-2xl border border-[#8795B3]/45 bg-gradient-to-br from-[#6F81A6]/75 to-[#4F5E7F]/75 text-white font-semibold text-base sm:text-lg shadow-[0_8px_30px_rgba(95,114,153,0.22)] hover:from-[#7C8DB0]/80 hover:to-[#58688A]/80 hover:shadow-[0_10px_34px_rgba(95,114,153,0.32)] transition-all duration-300 cursor-pointer active:scale-[0.98]"
+              className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 min-w-[220px] sm:min-w-[260px] text-center rounded-2xl border-2 border-[#8795B3]/60 bg-transparent text-white font-semibold text-base sm:text-lg hover:border-[#8795B3]/80 hover:bg-[#8795B3]/10 transition-all duration-300 cursor-pointer active:scale-[0.98]"
             >
               View Strategies
             </Link>
