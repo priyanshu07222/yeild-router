@@ -1,10 +1,12 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useReadContract } from "wagmi";
 import { useStrategies } from "@/hooks/useStrategies";
 import vaultABI from "@/contracts/abi.json";
 
-const VAULT_ADDRESS = process.env.NEXT_PUBLIC_VAULT_ADDRESS || "0x0000000000000000000000000000000000000000";
+const VAULT_ADDRESS =
+  process.env.NEXT_PUBLIC_VAULT_ADDRESS || "0x0000000000000000000000000000000000000000";
 
 // Chain ID to name mapping
 const CHAIN_NAMES: Record<number, string> = {
@@ -17,11 +19,25 @@ const CHAIN_NAMES: Record<number, string> = {
 };
 
 // Protocol name mapping (can be extended)
-const getProtocolName = (chainId: number, address: string): string => {
+const getProtocolName = (chainId: number) => {
   const chainName = CHAIN_NAMES[chainId] || `Chain ${chainId}`;
-  // For demo, we'll use chain name + "Strategy"
-  // In production, you'd maintain a registry or fetch from contract metadata
   return `${chainName} Strategy`;
+};
+
+const getChainBadgeClasses = (chainId: number) => {
+  if (chainId === 1284) {
+    // Moonbeam
+    return "bg-indigo-500/20 text-indigo-300 border-indigo-400/40";
+  }
+  if (chainId === 592) {
+    // Astar
+    return "bg-emerald-500/20 text-emerald-300 border-emerald-400/40";
+  }
+  if (chainId === 2034) {
+    // Hydration
+    return "bg-amber-500/20 text-amber-300 border-amber-400/40";
+  }
+  return "bg-[#8795B3]/15 text-[#A8C1D9] border-[#8795B3]/40";
 };
 
 export default function StrategyTable() {
@@ -33,6 +49,34 @@ export default function StrategyTable() {
     abi: vaultABI,
     functionName: "currentStrategy",
   });
+
+  const currentStrategyAddress = currentStrategy as string | undefined;
+
+  // Track last strategy to detect cross-chain rebalances for UI only
+  const [lastStrategyAddress, setLastStrategyAddress] = useState<string | undefined>();
+  const [showCrossChainBanner, setShowCrossChainBanner] = useState(false);
+
+  useEffect(() => {
+    if (!currentStrategyAddress || !lastStrategyAddress || strategies.length === 0) {
+      setLastStrategyAddress(currentStrategyAddress);
+      return;
+    }
+
+    const prev = strategies.find(
+      (s) => s.address.toLowerCase() === lastStrategyAddress.toLowerCase()
+    );
+    const curr = strategies.find(
+      (s) => s.address.toLowerCase() === currentStrategyAddress.toLowerCase()
+    );
+
+    if (prev && curr && prev.chainId !== curr.chainId) {
+      setShowCrossChainBanner(true);
+      const timer = setTimeout(() => setShowCrossChainBanner(false), 8000);
+      return () => clearTimeout(timer);
+    }
+
+    setLastStrategyAddress(currentStrategyAddress);
+  }, [currentStrategyAddress, lastStrategyAddress, strategies]);
 
   const formatAddress = (address: string) => {
     if (!address || address === "0x0000000000000000000000000000000000000000") {
@@ -73,18 +117,29 @@ export default function StrategyTable() {
     );
   }
 
-  const currentStrategyAddress = currentStrategy as string | undefined;
-
   return (
     <div className="glass-card rounded-xl overflow-hidden">
-      <div className="px-6 py-4 border-b border-white/10 flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-white">Available Strategies</h2>
-        <button
-          onClick={rebalance}
-          className="px-4 py-2 bg-[#8795B3] hover:bg-[#3A404D] text-white font-medium rounded-lg transition-colors cursor-pointer"
-        >
-          Rebalance
-        </button>
+      <div className="px-6 py-4 border-b border-white/10 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-xl font-semibold text-white">Strategy Dashboard</h2>
+          <p className="text-xs sm:text-sm text-[#8795B3] mt-1">
+            Protocols, chains, APYs and risk for each yield route.
+          </p>
+        </div>
+        <div className="flex flex-col items-stretch sm:items-end gap-2">
+          {showCrossChainBanner && (
+            <div className="px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-400/40 text-emerald-300 text-[11px] sm:text-xs font-medium flex items-center gap-1.5">
+              <span className="inline-flex w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" />
+              Cross-chain rebalance via XCM
+            </div>
+          )}
+          <button
+            onClick={rebalance}
+            className="px-4 py-2 bg-[#8795B3] hover:bg-[#3A404D] text-white font-medium rounded-lg transition-colors cursor-pointer text-sm"
+          >
+            Rebalance
+          </button>
+        </div>
       </div>
 
       <div className="overflow-x-auto">
@@ -93,7 +148,7 @@ export default function StrategyTable() {
             strategies.map((strategy, index) => {
               const isCurrentStrategy = currentStrategyAddress?.toLowerCase() === strategy.address.toLowerCase();
               const chainName = CHAIN_NAMES[strategy.chainId] || `Chain ${strategy.chainId}`;
-              const protocolName = getProtocolName(strategy.chainId, strategy.address);
+              const protocolName = getProtocolName(strategy.chainId);
               const riskInfo = getRiskLabel(strategy.riskScore);
               
               return (
@@ -111,9 +166,18 @@ export default function StrategyTable() {
                       <h3 className="text-lg sm:text-xl font-bold text-white truncate">
                         {protocolName}
                       </h3>
-                      <p className="text-xs sm:text-sm text-[#8795B3] mt-0.5">
-                        Chain: {chainName}
-                      </p>
+                      <div className="mt-1 flex flex-wrap items-center gap-2">
+                        <span
+                          className={`px-2 py-0.5 rounded-full border text-[11px] font-medium ${getChainBadgeClasses(
+                            strategy.chainId
+                          )}`}
+                        >
+                          {chainName}
+                        </span>
+                        <span className="text-[11px] text-[#8795B3]">
+                          Protocol • {formatAddress(strategy.address)}
+                        </span>
+                      </div>
                     </div>
                     {isCurrentStrategy && (
                       <span className="ml-2 px-2.5 py-1 text-xs font-semibold bg-[#8795B3]/40 text-white rounded-full border border-[#8795B3]/60 whitespace-nowrap">

@@ -119,6 +119,23 @@ contract StrategyManager is Ownable {
     }
 
     /**
+     * @notice Get the chain ID for a given strategy address
+     * @param strategy Strategy contract address
+     * @return chainId Chain ID where the strategy is deployed
+     */
+    function getStrategyChain(address strategy) external view returns (uint256 chainId) {
+        require(strategy != address(0), "StrategyManager: invalid strategy address");
+
+        for (uint256 i = 0; i < strategies.length; i++) {
+            if (strategies[i].strategy == strategy) {
+                return strategies[i].chainId;
+            }
+        }
+
+        revert("StrategyManager: strategy not found");
+    }
+
+    /**
      * @notice Get total number of strategies
      * @return Number of strategies
      */

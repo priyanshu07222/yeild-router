@@ -5,6 +5,7 @@ import {Script, console} from "forge-std/Script.sol";
 import {StrategyManager} from "../src/StrategyManager.sol";
 import {MockStrategy} from "../src/MockStrategy.sol";
 import {Vault} from "../src/Vault.sol";
+import {XCMRouter} from "../src/XCMRouter.sol";
 
 /**
  * @title DeployVault
@@ -16,6 +17,7 @@ contract DeployVault is Script {
     MockStrategy public moonbeamStrategy;
     MockStrategy public astarStrategy;
     MockStrategy public hydrationStrategy;
+    XCMRouter public xcmRouter;
     Vault public vault;
 
     function run() public {
@@ -29,13 +31,18 @@ contract DeployVault is Script {
         console.log("Deployer:", owner);
         console.log("Asset Address:", assetAddress);
 
-        // Deploy StrategyManager
-        console.log("\n1. Deploying StrategyManager...");
+        // 1. Deploy XCMRouter (simulation only)
+        console.log("\n1. Deploying XCMRouter...");
+        xcmRouter = new XCMRouter();
+        console.log("XCMRouter deployed at:", address(xcmRouter));
+
+        // 2. Deploy StrategyManager
+        console.log("\n2. Deploying StrategyManager...");
         strategyManager = new StrategyManager(owner);
         console.log("StrategyManager deployed at:", address(strategyManager));
 
-        // Deploy multiple MockStrategies (representing different parachains)
-        console.log("\n2. Deploying MockStrategies...");
+        // 3. Deploy multiple MockStrategies (representing different parachains)
+        console.log("\n3. Deploying MockStrategies...");
         
         moonbeamStrategy = new MockStrategy(assetAddress);
         console.log("Moonbeam Strategy:", address(moonbeamStrategy));
@@ -46,13 +53,13 @@ contract DeployVault is Script {
         hydrationStrategy = new MockStrategy(assetAddress);
         console.log("Hydration Strategy:", address(hydrationStrategy));
 
-        // Deploy Vault
-        console.log("\n3. Deploying Vault...");
-        vault = new Vault(assetAddress, address(strategyManager), owner);
+        // 4. Deploy Vault
+        console.log("\n4. Deploying Vault...");
+        vault = new Vault(assetAddress, address(strategyManager), address(xcmRouter));
         console.log("Vault deployed at:", address(vault));
 
         // Add strategies to StrategyManager with different APYs and risk scores
-        console.log("\n4. Adding strategies to StrategyManager...");
+        console.log("\n5. Adding strategies to StrategyManager...");
         
         // Moonbeam: 8% APY (800 basis points), Low risk (2), Chain ID 1284
         strategyManager.addStrategy(address(moonbeamStrategy), 800, 1284, 2);
@@ -87,6 +94,7 @@ contract DeployVault is Script {
         console.log("Note: Astar and Hydration tie at 800, but Astar is added first");
 
         console.log("\n=== Deployment Summary ===");
+        console.log("XCMRouter:", address(xcmRouter));
         console.log("StrategyManager:", address(strategyManager));
         console.log("Moonbeam Strategy:", address(moonbeamStrategy));
         console.log("Astar Strategy:", address(astarStrategy));

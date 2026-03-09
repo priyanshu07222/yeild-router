@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "./StrategyManager.sol";
 import "./StrategyBase.sol";
+import "./XCMRouter.sol";
 
 /**
  * @title Vault
@@ -21,6 +22,9 @@ contract Vault is Ownable, ReentrancyGuard {
 
     /// @notice The strategy manager contract
     StrategyManager public strategyManager;
+
+    /// @notice Simulated Polkadot XCM router for cross-chain messaging
+    XCMRouter public xcmRouter;
 
     /// @notice Total shares issued
     uint256 public totalShares;
@@ -43,14 +47,15 @@ contract Vault is Ownable, ReentrancyGuard {
      * @notice Constructor
      * @param _asset Address of the ERC20 asset token
      * @param _strategyManager Address of the StrategyManager contract
-     * @param _owner Address of the contract owner
+     * @param _xcmRouter Address of the XCMRouter contract (simulation-only)
      */
-    constructor(address _asset, address _strategyManager, address _owner) Ownable(_owner) {
+    constructor(address _asset, address _strategyManager, address _xcmRouter) Ownable(msg.sender) {
         require(_asset != address(0), "Vault: invalid asset address");
         require(_strategyManager != address(0), "Vault: invalid strategy manager address");
         
         asset = IERC20(_asset);
         strategyManager = StrategyManager(_strategyManager);
+        xcmRouter = XCMRouter(_xcmRouter);
     }
 
     /**
@@ -180,6 +185,18 @@ contract Vault is Ownable, ReentrancyGuard {
         // Deposit all available funds into new strategy
         uint256 vaultBalance = asset.balanceOf(address(this));
         if (vaultBalance > 0) {
+            // Simulation-only: emit a cross-chain transfer event via the XCM router
+            // In production, this is where Polkadot XCM messaging would be dispatched via precompiles/endpoints.
+            if (oldStrategy != address(0) && address(xcmRouter) != address(0)) {
+                uint256 oldStrategyChainId = _getStrategyChainId(oldStrategy);
+                uint256 newStrategyChainId = _getStrategyChainId(bestStrategy);
+                try xcmRouter.sendXCM(oldStrategyChainId, newStrategyChainId, bestStrategy, vaultBalance) {
+                    // no-op
+                } catch {
+                    // best-effort simulation; do not impact vault rebalance behavior
+                }
+            }
+
             // Reset approval to 0 first, then set to amount
             uint256 currentAllowance = asset.allowance(address(this), bestStrategy);
             if (currentAllowance > 0) {
@@ -195,6 +212,17 @@ contract Vault is Ownable, ReentrancyGuard {
         }
 
         emit Rebalance(oldStrategy, bestStrategy);
+    }
+
+    function _getStrategyChainId(address strategy) internal view returns (uint256) {
+        uint256 count = strategyManager.getStrategyCount();
+        for (uint256 i = 0; i < count; i++) {
+            StrategyManager.Strategy memory info = strategyManager.getStrategy(i);
+            if (info.strategy == strategy) {
+                return info.chainId;
+            }
+        }
+        return 0;
     }
 
     /**

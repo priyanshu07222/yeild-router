@@ -5,6 +5,7 @@ import {Test, console} from "forge-std/Test.sol";
 import {Vault} from "../src/Vault.sol";
 import {StrategyManager} from "../src/StrategyManager.sol";
 import {MockStrategy} from "../src/MockStrategy.sol";
+import {XCMRouter} from "../src/XCMRouter.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 // Mock ERC20 token for testing
@@ -49,6 +50,7 @@ contract MockERC20 is IERC20 {
 
 contract VaultTest is Test {
     Vault public vault;
+    XCMRouter public xcmRouter;
     StrategyManager public strategyManager;
     MockERC20 public asset;
     MockStrategy public moonbeamStrategy;
@@ -79,8 +81,11 @@ contract VaultTest is Test {
         strategyManager.addStrategy(address(moonbeamStrategy), 500, 1284, 2); // Moonbeam, Low risk
         strategyManager.addStrategy(address(astarStrategy), 1000, 592, 3); // Astar, Medium risk
         
+        // Deploy XCMRouter (simulation only)
+        xcmRouter = new XCMRouter();
+
         // Deploy Vault
-        vault = new Vault(address(asset), address(strategyManager), owner);
+        vault = new Vault(address(asset), address(strategyManager), address(xcmRouter));
 
         // Mint tokens to users
         asset.mint(user1, INITIAL_BALANCE);

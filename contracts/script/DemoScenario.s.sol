@@ -5,6 +5,7 @@ import {Script, console} from "forge-std/Script.sol";
 import {StrategyManager} from "../src/StrategyManager.sol";
 import {MockStrategy} from "../src/MockStrategy.sol";
 import {Vault} from "../src/Vault.sol";
+import {XCMRouter} from "../src/XCMRouter.sol";
 import {MockERC20} from "../test/Vault.t.sol";
 
 /**
@@ -17,6 +18,7 @@ import {MockERC20} from "../test/Vault.t.sol";
  */
 contract DemoScenario is Script {
     Vault public vault;
+    XCMRouter public xcmRouter;
     StrategyManager public strategyManager;
     MockERC20 public asset;
     MockStrategy public moonbeamStrategy;
@@ -67,8 +69,12 @@ contract DemoScenario is Script {
         console.log("Moonbeam Strategy:", address(moonbeamStrategy));
         console.log("Astar Strategy:", address(astarStrategy));
 
+        // Deploy XCMRouter (simulation only)
+        xcmRouter = new XCMRouter();
+        console.log("XCMRouter:", address(xcmRouter));
+
         // Deploy Vault
-        vault = new Vault(address(asset), address(strategyManager), owner);
+        vault = new Vault(address(asset), address(strategyManager), address(xcmRouter));
         console.log("Vault:", address(vault));
 
         // Add strategies with initial APY

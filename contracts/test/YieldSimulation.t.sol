@@ -5,10 +5,12 @@ import {Test, console} from "forge-std/Test.sol";
 import {Vault} from "../src/Vault.sol";
 import {StrategyManager} from "../src/StrategyManager.sol";
 import {MockStrategy} from "../src/MockStrategy.sol";
+import {XCMRouter} from "../src/XCMRouter.sol";
 import {MockERC20} from "./Vault.t.sol";
 
 contract YieldSimulationTest is Test {
     Vault public vault;
+    XCMRouter public xcmRouter;
     StrategyManager public strategyManager;
     MockERC20 public asset;
     MockStrategy public moonbeamStrategy;
@@ -30,8 +32,11 @@ contract YieldSimulationTest is Test {
         moonbeamStrategy = new MockStrategy(address(asset));
         astarStrategy = new MockStrategy(address(asset));
         
+        // Deploy XCMRouter (simulation only)
+        xcmRouter = new XCMRouter();
+
         // Deploy Vault
-        vault = new Vault(address(asset), address(strategyManager), owner);
+        vault = new Vault(address(asset), address(strategyManager), address(xcmRouter));
 
         // Mint tokens to user
         asset.mint(user1, INITIAL_BALANCE);

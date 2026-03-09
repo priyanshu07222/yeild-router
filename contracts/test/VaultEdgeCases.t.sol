@@ -5,10 +5,12 @@ import {Test, console} from "forge-std/Test.sol";
 import {Vault} from "../src/Vault.sol";
 import {StrategyManager} from "../src/StrategyManager.sol";
 import {MockStrategy} from "../src/MockStrategy.sol";
+import {XCMRouter} from "../src/XCMRouter.sol";
 import {MockERC20} from "./Vault.t.sol";
 
 contract VaultEdgeCasesTest is Test {
     Vault public vault;
+    XCMRouter public xcmRouter;
     StrategyManager public strategyManager;
     MockERC20 public asset;
     MockStrategy public strategy1;
@@ -38,7 +40,8 @@ contract VaultEdgeCasesTest is Test {
         strategyManager.addStrategy(address(strategy2), 1000, 592, 3);
         strategyManager.addStrategy(address(strategy3), 1500, 2034, 5);
         
-        vault = new Vault(address(asset), address(strategyManager), owner);
+        xcmRouter = new XCMRouter();
+        vault = new Vault(address(asset), address(strategyManager), address(xcmRouter));
 
         asset.mint(user1, INITIAL_BALANCE);
         asset.mint(user2, INITIAL_BALANCE);
@@ -264,7 +267,6 @@ contract VaultEdgeCasesTest is Test {
         vm.prank(user2);
         vault.deposit(deposit2);
         
-        uint256 totalShares = vault.totalShares();
         uint256 user1Shares = vault.userShares(user1);
         uint256 user2Shares = vault.userShares(user2);
         

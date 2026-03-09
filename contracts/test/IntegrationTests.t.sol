@@ -5,10 +5,12 @@ import {Test, console} from "forge-std/Test.sol";
 import {Vault} from "../src/Vault.sol";
 import {StrategyManager} from "../src/StrategyManager.sol";
 import {MockStrategy} from "../src/MockStrategy.sol";
+import {XCMRouter} from "../src/XCMRouter.sol";
 import {MockERC20} from "./Vault.t.sol";
 
 contract IntegrationTests is Test {
     Vault public vault;
+    XCMRouter public xcmRouter;
     StrategyManager public strategyManager;
     MockERC20 public asset;
     MockStrategy public moonbeamStrategy;
@@ -38,7 +40,8 @@ contract IntegrationTests is Test {
         strategyManager.addStrategy(address(astarStrategy), 1000, 592, 3);
         strategyManager.addStrategy(address(hydrationStrategy), 1500, 2034, 5);
         
-        vault = new Vault(address(asset), address(strategyManager), owner);
+        xcmRouter = new XCMRouter();
+        vault = new Vault(address(asset), address(strategyManager), address(xcmRouter));
 
         asset.mint(user1, INITIAL_BALANCE);
         asset.mint(user2, INITIAL_BALANCE);

@@ -1,0 +1,12 @@
+[
+  {
+    "type": "event",
+    "name": "XCMTransfer",
+    "inputs": [
+      { "name": "fromChain", "type": "uint256", "indexed": true },
+      { "name": "toChain", "type": "uint256", "indexed": true },
+      { "name": "strategy", "type": "address", "indexed": true },
+      { "name": "amount", "type": "uint256", "indexed": false }
+    ]
+  }
+]

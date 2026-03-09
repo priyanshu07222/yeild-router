@@ -2,6 +2,7 @@
 
 import { useVault } from "@/hooks/useVault";
 import { motion } from "framer-motion";
+import XCMActivity from "@/components/XCMActivity";
 
 export default function DashboardPage() {
   const { totalAssets, userShares } = useVault();
@@ -21,7 +22,7 @@ export default function DashboardPage() {
         Dashboard
       </motion.h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -46,6 +47,14 @@ export default function DashboardPage() {
           </p>
         </motion.div>
       </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+      >
+        <XCMActivity />
+      </motion.div>
     </div>
   );
 }
