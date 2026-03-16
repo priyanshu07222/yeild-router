@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 
-// Chain ID to name mapping
+// EVM chain ID to name (README: 1284 Moonbeam, 592 Astar, 2034 HydraDX)
 const CHAIN_NAMES: Record<number, string> = {
   1284: "Moonbeam",
   592: "Astar",

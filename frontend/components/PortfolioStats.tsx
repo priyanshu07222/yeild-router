@@ -5,6 +5,7 @@ import { useReadContract } from "wagmi";
 import { useVault } from "@/hooks/useVault";
 import vaultABI from "@/contracts/abi.json";
 import strategyManagerABI from "@/contracts/strategyManagerABI.json";
+import { ASSET_SYMBOL } from "@/lib/constants";
 
 const VAULT_ADDRESS = process.env.NEXT_PUBLIC_VAULT_ADDRESS || "0x0000000000000000000000000000000000000000";
 const STRATEGY_MANAGER_ADDRESS = process.env.NEXT_PUBLIC_STRATEGY_MANAGER_ADDRESS || "0x0000000000000000000000000000000000000000";
@@ -86,21 +87,21 @@ export default function PortfolioStats() {
     },
     {
       label: "Vault Value",
-      value: `$${calculateUserValue()}`,
+      value: `${calculateUserValue()} ${ASSET_SYMBOL}`,
       icon: "💰",
       color: "text-[#8795B3]",
       badge: "Calculated",
     },
     {
       label: "Est. Yield",
-      value: `+$${calculateEstimatedYield()}`,
+      value: `+${calculateEstimatedYield()} ${ASSET_SYMBOL}`,
       icon: "📈",
       color: "text-emerald-400",
       badge: "Estimated",
     },
     {
       label: "Total TVL",
-      value: `$${formatValue(totalAssetsBigInt)}`,
+      value: `${formatValue(totalAssetsBigInt)} ${ASSET_SYMBOL}`,
       icon: "📊",
       color: "text-white",
       badge: "Real-time",

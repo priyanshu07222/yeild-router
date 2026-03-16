@@ -8,7 +8,7 @@ import vaultABI from "@/contracts/abi.json";
 const VAULT_ADDRESS =
   process.env.NEXT_PUBLIC_VAULT_ADDRESS || "0x0000000000000000000000000000000000000000";
 
-// Chain ID to name mapping
+// EVM chain ID to name (README: 1284 Moonbeam, 592 Astar, 2034 HydraDX)
 const CHAIN_NAMES: Record<number, string> = {
   1284: "Moonbeam",
   1285: "Moonriver",

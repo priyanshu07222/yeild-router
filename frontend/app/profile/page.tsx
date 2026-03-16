@@ -20,7 +20,7 @@ export default function ProfilePage() {
       {/* Charts and Projections Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <PerformanceChart />
-        <YieldProjectionCard depositAmount={1000} currentAPY={15.2} />
+        <YieldProjectionCard depositAmount={100} currentAPY={15.2} />
       </div>
 
       {/* Strategy Allocation */}

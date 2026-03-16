@@ -1,0 +1,15 @@
+[package]
+name = "pvm"
+version = "0.1.0"
+edition = "2021"
+
+# This crate is the Rust source for the PVM optimizer. It is compiled to
+# PolkaVM bytecode and deployed as a PVM smart contract on Polkadot Hub;
+# StrategyOptimizerAdapter (Solidity) calls that contract. See README.
+
+[lib]
+name = "pvm"
+path = "src/lib.rs"
+
+[dependencies]
+

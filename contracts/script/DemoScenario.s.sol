@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import {Script, console} from "forge-std/Script.sol";
 import {StrategyManager} from "../src/StrategyManager.sol";
+import {StrategyOptimizerAdapter} from "../src/StrategyOptimizerAdapter.sol";
 import {MockStrategy} from "../src/MockStrategy.sol";
 import {Vault} from "../src/Vault.sol";
 import {XCMRouter} from "../src/XCMRouter.sol";
@@ -19,6 +20,7 @@ import {MockERC20} from "../test/Vault.t.sol";
 contract DemoScenario is Script {
     Vault public vault;
     XCMRouter public xcmRouter;
+    StrategyOptimizerAdapter public optimizer;
     StrategyManager public strategyManager;
     MockERC20 public asset;
     MockStrategy public moonbeamStrategy;
@@ -59,9 +61,12 @@ contract DemoScenario is Script {
         asset = new MockERC20();
         console.log("Asset Token:", address(asset));
 
-        // Deploy StrategyManager
-        strategyManager = new StrategyManager(owner);
+        // Deploy StrategyOptimizerAdapter, then StrategyManager (pass adapter)
+        optimizer = new StrategyOptimizerAdapter(address(0));
+        console.log("StrategyOptimizerAdapter:", address(optimizer));
+        strategyManager = new StrategyManager(owner, address(optimizer));
         console.log("StrategyManager:", address(strategyManager));
+        console.log("Adapter address:", address(optimizer));
 
         // Deploy MockStrategies (representing different parachains)
         moonbeamStrategy = new MockStrategy(address(asset));
@@ -70,7 +75,7 @@ contract DemoScenario is Script {
         console.log("Astar Strategy:", address(astarStrategy));
 
         // Deploy XCMRouter (simulation only)
-        xcmRouter = new XCMRouter();
+        xcmRouter = new XCMRouter(address(0));
         console.log("XCMRouter:", address(xcmRouter));
 
         // Deploy Vault

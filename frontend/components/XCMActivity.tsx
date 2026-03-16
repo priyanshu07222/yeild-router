@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useXCMTransfers } from "@/hooks/useXCMTransfers";
 
+// EVM chain IDs (README: 1284 Moonbeam, 592 Astar, 2034 HydraDX) for display
 const CHAIN_NAMES: Record<number, string> = {
   1284: "Moonbeam",
   592: "Astar",

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { ASSET_SYMBOL } from "@/lib/constants";
 import {
   LineChart,
   Line,
@@ -43,14 +44,16 @@ export default function PerformanceChart() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="glass-card rounded-2xl p-6"
+      className="glass-card rounded-2xl p-6 w-full"
     >
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl sm:text-2xl font-bold text-white">Portfolio Performance</h2>
-        <span className="px-2.5 py-1 text-[10px] sm:text-xs font-medium bg-amber-500/15 text-amber-400 border border-amber-500/30 rounded-full">
-          Estimated
-        </span>
-        <div className="flex gap-2">
+      <div className="flex flex-row items-center justify-between gap-4 mb-6 flex-wrap">
+        <div className="flex items-center gap-3 min-w-[180px]">
+          <h2 className="text-xl sm:text-2xl font-bold text-white">Portfolio Performance</h2>
+          <span className="px-2.5 py-1 text-[10px] sm:text-xs font-medium bg-amber-500/15 text-amber-400 border border-amber-500/30 rounded-full">
+            Estimated
+          </span>
+        </div>
+        <div className="flex gap-2 flex-wrap justify-end shrink-0">
           {timeFilters.map((filter) => (
             <button
               key={filter.days}
@@ -78,7 +81,7 @@ export default function PerformanceChart() {
           <YAxis
             stroke="#8795B3"
             style={{ fontSize: "12px" }}
-            tickFormatter={(value) => `$${value}`}
+            tickFormatter={(value) => `${value} ${ASSET_SYMBOL}`}
           />
           <Tooltip
             contentStyle={{
@@ -87,7 +90,7 @@ export default function PerformanceChart() {
               borderRadius: "8px",
               color: "#FFFFFF",
             }}
-            formatter={(value: number) => [`$${value.toFixed(2)}`, "Value"]}
+            formatter={(value: number) => [`${value.toFixed(2)} ${ASSET_SYMBOL}`, "Value"]}
           />
           <Line
             type="monotone"

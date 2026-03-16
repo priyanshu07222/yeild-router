@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {Test, console} from "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 import {Vault} from "../src/Vault.sol";
 import {StrategyManager} from "../src/StrategyManager.sol";
+import {StrategyOptimizerAdapter} from "../src/StrategyOptimizerAdapter.sol";
 import {MockStrategy} from "../src/MockStrategy.sol";
 import {XCMRouter} from "../src/XCMRouter.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -51,6 +52,7 @@ contract MockERC20 is IERC20 {
 contract VaultTest is Test {
     Vault public vault;
     XCMRouter public xcmRouter;
+    StrategyOptimizerAdapter public optimizer;
     StrategyManager public strategyManager;
     MockERC20 public asset;
     MockStrategy public moonbeamStrategy;
@@ -66,8 +68,8 @@ contract VaultTest is Test {
         // Deploy mock ERC20 token
         asset = new MockERC20();
         
-        // Deploy StrategyManager
-        strategyManager = new StrategyManager(owner);
+        optimizer = new StrategyOptimizerAdapter(address(0));
+        strategyManager = new StrategyManager(owner, address(optimizer));
         
         // Deploy MockStrategies (Moonbeam and Astar)
         moonbeamStrategy = new MockStrategy(address(asset));
@@ -82,7 +84,7 @@ contract VaultTest is Test {
         strategyManager.addStrategy(address(astarStrategy), 1000, 592, 3); // Astar, Medium risk
         
         // Deploy XCMRouter (simulation only)
-        xcmRouter = new XCMRouter();
+        xcmRouter = new XCMRouter(address(0));
 
         // Deploy Vault
         vault = new Vault(address(asset), address(strategyManager), address(xcmRouter));

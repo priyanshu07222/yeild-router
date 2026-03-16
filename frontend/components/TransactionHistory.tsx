@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { ASSET_SYMBOL } from "@/lib/constants";
 
 // Mock transaction data - in production, fetch from blockchain
 const transactions = [
@@ -87,7 +88,7 @@ export default function TransactionHistory() {
                 <td className="py-4 px-4">
                   <span className={`font-semibold ${tx.color}`}>{tx.type}</span>
                 </td>
-                <td className="py-4 px-4 text-white text-sm">${tx.amount}</td>
+                <td className="py-4 px-4 text-white text-sm">{tx.amount} {ASSET_SYMBOL}</td>
                   <td className="py-4 px-4 text-[#8795B3] text-sm">{tx.strategy}</td>
                 <td className="py-4 px-4">
                   <a

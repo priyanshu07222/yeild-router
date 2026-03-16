@@ -3,6 +3,7 @@
 import { useVault } from "@/hooks/useVault";
 import { motion } from "framer-motion";
 import XCMActivity from "@/components/XCMActivity";
+import { ASSET_SYMBOL } from "@/lib/constants";
 
 export default function DashboardPage() {
   const { totalAssets, userShares } = useVault();
@@ -31,7 +32,7 @@ export default function DashboardPage() {
         >
           <h3 className="text-[#A8C1D9] text-sm mb-2">Total Assets</h3>
           <p className="text-3xl font-bold text-white">
-            ${formatValue(totalAssets)}
+            {formatValue(totalAssets)} {ASSET_SYMBOL}
           </p>
         </motion.div>
 

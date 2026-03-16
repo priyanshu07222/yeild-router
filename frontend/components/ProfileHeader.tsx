@@ -6,6 +6,7 @@ import { useAccount, useReadContract } from "wagmi";
 import { formatEther } from "viem";
 import { useVault } from "@/hooks/useVault";
 import vaultABI from "@/contracts/abi.json";
+import { ASSET_SYMBOL } from "@/lib/constants";
 
 const VAULT_ADDRESS = process.env.NEXT_PUBLIC_VAULT_ADDRESS || "0x0000000000000000000000000000000000000000";
 
@@ -125,21 +126,21 @@ export default function ProfileHeader() {
             <div>
               <p className="text-[#8795B3] text-xs sm:text-sm mb-1">Your Vault Value</p>
               <p className="text-lg sm:text-xl font-bold text-[#8795B3]">
-                ${calculateUserValue()}
+                {calculateUserValue()} {ASSET_SYMBOL}
               </p>
               <p className="text-[10px] sm:text-xs text-[#8795B3]/60 mt-0.5">Real-time</p>
             </div>
             <div>
               <p className="text-[#8795B3] text-xs sm:text-sm mb-1">Est. Yield</p>
               <p className="text-lg sm:text-xl font-bold text-emerald-400">
-                +${calculateEstimatedYield()}
+                +{calculateEstimatedYield()} {ASSET_SYMBOL}
               </p>
               <p className="text-[10px] sm:text-xs text-[#8795B3]/60 mt-0.5">Approx</p>
             </div>
             <div>
               <p className="text-[#8795B3] text-xs sm:text-sm mb-1">Total TVL</p>
               <p className="text-lg sm:text-xl font-bold text-white">
-                ${formatValue(totalAssetsBigInt)}
+                {formatValue(totalAssetsBigInt)} {ASSET_SYMBOL}
               </p>
               <p className="text-[10px] sm:text-xs text-[#8795B3]/60 mt-0.5">Real-time</p>
             </div>

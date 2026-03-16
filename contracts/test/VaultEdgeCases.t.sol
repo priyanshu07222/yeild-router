@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {Test, console} from "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 import {Vault} from "../src/Vault.sol";
 import {StrategyManager} from "../src/StrategyManager.sol";
+import {StrategyOptimizerAdapter} from "../src/StrategyOptimizerAdapter.sol";
 import {MockStrategy} from "../src/MockStrategy.sol";
 import {XCMRouter} from "../src/XCMRouter.sol";
 import {MockERC20} from "./Vault.t.sol";
@@ -11,6 +12,7 @@ import {MockERC20} from "./Vault.t.sol";
 contract VaultEdgeCasesTest is Test {
     Vault public vault;
     XCMRouter public xcmRouter;
+    StrategyOptimizerAdapter public optimizer;
     StrategyManager public strategyManager;
     MockERC20 public asset;
     MockStrategy public strategy1;
@@ -26,8 +28,9 @@ contract VaultEdgeCasesTest is Test {
 
     function setUp() public {
         asset = new MockERC20();
-        strategyManager = new StrategyManager(owner);
-        
+        optimizer = new StrategyOptimizerAdapter(address(0));
+        strategyManager = new StrategyManager(owner, address(optimizer));
+
         strategy1 = new MockStrategy(address(asset));
         strategy2 = new MockStrategy(address(asset));
         strategy3 = new MockStrategy(address(asset));
@@ -40,7 +43,7 @@ contract VaultEdgeCasesTest is Test {
         strategyManager.addStrategy(address(strategy2), 1000, 592, 3);
         strategyManager.addStrategy(address(strategy3), 1500, 2034, 5);
         
-        xcmRouter = new XCMRouter();
+        xcmRouter = new XCMRouter(address(0));
         vault = new Vault(address(asset), address(strategyManager), address(xcmRouter));
 
         asset.mint(user1, INITIAL_BALANCE);

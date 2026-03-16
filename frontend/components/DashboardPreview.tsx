@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useVault } from "@/hooks/useVault";
+import { ASSET_SYMBOL } from "@/lib/constants";
 
 export default function DashboardPreview() {
   const { totalAssets } = useVault();
@@ -45,7 +46,7 @@ export default function DashboardPreview() {
   const stats = [
     { label: "Best Strategy", value: "Moonbeam", change: "15% APY", accent: "#7C8CFF" },
     { label: "Current APY", value: "15.2%", change: "+2.1%", accent: "#34D399" },
-    { label: "User Deposits", value: `$${formatValue(totalAssets)}`, change: "Active", accent: "#F59E0B" },
+    { label: "User Deposits", value: `${formatValue(totalAssets)} ${ASSET_SYMBOL}`, change: "Active", accent: "#F59E0B" },
   ];
 
   return (
@@ -75,7 +76,7 @@ export default function DashboardPreview() {
             >
               <p className="text-[#8795B3] text-xs sm:text-sm mb-2 sm:mb-3">Total Value Locked</p>
               <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2">
-                ${formatValue(totalAssets)}
+                {formatValue(totalAssets)} {ASSET_SYMBOL}
               </p>
               <p className="text-[#34D399] text-xs sm:text-sm mb-3 sm:mb-4">+12.5% this week</p>
               <div className="h-2 rounded-full bg-[#3A404D]/40 overflow-hidden max-w-[200px] sm:max-w-xs mx-auto">
@@ -126,7 +127,7 @@ export default function DashboardPreview() {
             >
               <p className="text-[#8795B3] text-sm mb-3">Total Value Locked</p>
               <p className="text-4xl md:text-5xl font-bold text-white mb-2">
-                ${formatValue(totalAssets)}
+                {formatValue(totalAssets)} {ASSET_SYMBOL}
               </p>
               <p className="text-[#34D399] text-sm mb-4">+12.5% this week</p>
               <div className="h-2 rounded-full bg-[#3A404D]/40 overflow-hidden">

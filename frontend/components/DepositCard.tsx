@@ -16,6 +16,11 @@ export default function DepositCard() {
     setMounted(true);
   }, []);
 
+  // Avoid hydration mismatches by only rendering on the client
+  if (!mounted) {
+    return null;
+  }
+
   const handleDeposit = async () => {
     if (!isConnected) {
       return;

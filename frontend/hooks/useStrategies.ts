@@ -11,7 +11,7 @@ const STRATEGY_MANAGER_ADDRESS = process.env.NEXT_PUBLIC_STRATEGY_MANAGER_ADDRES
 export interface Strategy {
   address: string;
   apy: number; // APY in basis points (e.g., 500 = 5%)
-  chainId: number; // Chain ID (e.g., Moonbeam=1284, Astar=592)
+  chainId: number; // EVM chain ID (e.g., Moonbeam=1284, Astar=592, HydraDX=2034)
   riskScore: number; // Risk score from 1 (lowest) to 10 (highest)
   active: boolean;
 }

@@ -2,14 +2,15 @@
 
 import { motion } from "framer-motion";
 import { TrendingUp, Calendar, Zap } from "lucide-react";
+import { ASSET_SYMBOL } from "@/lib/constants";
 
 interface YieldProjectionCardProps {
-  depositAmount?: number; // In dollars
+  depositAmount?: number; // In PAS (native asset)
   currentAPY?: number; // As percentage (e.g., 12 for 12%)
 }
 
 export default function YieldProjectionCard({
-  depositAmount = 1000,
+  depositAmount = 100,
   currentAPY = 12,
 }: YieldProjectionCardProps) {
   
@@ -83,7 +84,7 @@ export default function YieldProjectionCard({
       <div className="relative z-10 mb-6 p-4 sm:p-5 bg-[#8795B3]/5 border border-[#8795B3]/20 rounded-xl">
         <p className="text-xs sm:text-sm text-[#8795B3] mb-1">Initial Deposit</p>
         <p className="text-2xl sm:text-3xl font-bold text-white">
-          ${formatCurrency(depositAmount)}
+          {formatCurrency(depositAmount)} {ASSET_SYMBOL}
         </p>
       </div>
 
@@ -124,14 +125,14 @@ export default function YieldProjectionCard({
                       {projection.period}
                     </p>
                     <p className="text-xs text-[#A8C1D9]">
-                      +${formatCurrency(yieldEarned)} yield
+                      +{formatCurrency(yieldEarned)} {ASSET_SYMBOL} yield
                     </p>
                   </div>
                 </div>
 
                 <div className="text-right">
                   <p className="text-xl sm:text-2xl font-bold text-white">
-                    ${formatCurrency(futureValue)}
+                    {formatCurrency(futureValue)} {ASSET_SYMBOL}
                   </p>
                   <p
                     className="text-xs sm:text-sm font-semibold mt-0.5"

@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {Test, console} from "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 import {StrategyManager} from "../src/StrategyManager.sol";
+import {StrategyOptimizerAdapter} from "../src/StrategyOptimizerAdapter.sol";
 import {MockStrategy} from "../src/MockStrategy.sol";
 import {MockERC20} from "./Vault.t.sol";
 
 contract StrategyManagerTest is Test {
+    StrategyOptimizerAdapter public optimizer;
     StrategyManager public strategyManager;
     MockERC20 public asset;
     MockStrategy public moonbeamStrategy;
@@ -20,8 +22,8 @@ contract StrategyManagerTest is Test {
         // Deploy mock ERC20 token
         asset = new MockERC20();
         
-        // Deploy StrategyManager
-        strategyManager = new StrategyManager(owner);
+        optimizer = new StrategyOptimizerAdapter(address(0));
+        strategyManager = new StrategyManager(owner, address(optimizer));
         
         // Deploy MockStrategies
         moonbeamStrategy = new MockStrategy(address(asset));

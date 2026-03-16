@@ -47,7 +47,7 @@ contract Vault is Ownable, ReentrancyGuard {
      * @notice Constructor
      * @param _asset Address of the ERC20 asset token
      * @param _strategyManager Address of the StrategyManager contract
-     * @param _xcmRouter Address of the XCMRouter contract (simulation-only)
+     * @param _xcmRouter Address of the XCMRouter (simulation when router's xcmPrecompile is 0). Pass address(0) to disable XCM (e.g. on chains where XCMRouter cannot be deployed).
      */
     constructor(address _asset, address _strategyManager, address _xcmRouter) Ownable(msg.sender) {
         require(_asset != address(0), "Vault: invalid asset address");
@@ -55,7 +55,7 @@ contract Vault is Ownable, ReentrancyGuard {
         
         asset = IERC20(_asset);
         strategyManager = StrategyManager(_strategyManager);
-        xcmRouter = XCMRouter(_xcmRouter);
+        xcmRouter = XCMRouter(_xcmRouter); // can be address(0); rebalance() skips XCM when 0
     }
 
     /**
@@ -185,8 +185,8 @@ contract Vault is Ownable, ReentrancyGuard {
         // Deposit all available funds into new strategy
         uint256 vaultBalance = asset.balanceOf(address(this));
         if (vaultBalance > 0) {
-            // Simulation-only: emit a cross-chain transfer event via the XCM router
-            // In production, this is where Polkadot XCM messaging would be dispatched via precompiles/endpoints.
+            // Cross-chain: notify XCMRouter (emits event; when xcmPrecompile set, router calls precompile).
+            // Current implementation uses EVM chain IDs (1284, 592, 2034) from strategy config; production XCM would use parachain IDs (README).
             if (oldStrategy != address(0) && address(xcmRouter) != address(0)) {
                 uint256 oldStrategyChainId = _getStrategyChainId(oldStrategy);
                 uint256 newStrategyChainId = _getStrategyChainId(bestStrategy);

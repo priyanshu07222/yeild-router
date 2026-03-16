@@ -1,29 +1,49 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useAccount, useWriteContract, useReadContract, useWaitForTransactionReceipt, usePublicClient } from "wagmi";
-import { parseEther } from "viem";
-import vaultABI from "@/contracts/abi.json";
+import { useEffect, useState } from 'react';
+import { useAccount, useWriteContract, useReadContract, useWaitForTransactionReceipt, usePublicClient } from 'wagmi';
+import { parseEther } from 'viem';
+import vaultABI from '@/contracts/abi.json';
+import erc20ABI from '@/contracts/erc20.json';
 
-const VAULT_ADDRESS = process.env.NEXT_PUBLIC_VAULT_ADDRESS || "0x0000000000000000000000000000000000000000";
+const VAULT_ADDRESS = process.env.NEXT_PUBLIC_VAULT_ADDRESS || '0x0000000000000000000000000000000000000000';
 
 const toBigIntSafe = (value: unknown): bigint => {
-  if (typeof value === "bigint") return value;
-  if (typeof value === "number") return BigInt(value);
-  if (typeof value === "string") return BigInt(value);
-  throw new Error("Unexpected contract response type");
+  if (typeof value === 'bigint') return value;
+  if (typeof value === 'number') return BigInt(value);
+  if (typeof value === 'string') return BigInt(value);
+  throw new Error('Unexpected contract response type');
 };
 
 export function useVault() {
   const { address, isConnected } = useAccount();
   const publicClient = usePublicClient();
   const [error, setError] = useState<string | null>(null);
+  const [assetAddress, setAssetAddress] = useState<`0x${string}` | null>(null);
+
+  // Discover underlying asset from the Vault
+  useEffect(() => {
+    const loadAsset = async () => {
+      if (!publicClient || !VAULT_ADDRESS || VAULT_ADDRESS === '0x0000000000000000000000000000000000000000') return;
+      try {
+        const result = await publicClient.readContract({
+          address: VAULT_ADDRESS as `0x${string}`,
+          abi: vaultABI,
+          functionName: 'asset',
+        });
+        setAssetAddress(result as `0x${string}`);
+      } catch {
+        // ignore, error will surface on deposit if misconfigured
+      }
+    };
+    loadAsset();
+  }, [publicClient]);
 
   // Read current user shares (reactive)
   const { data: userShares } = useReadContract({
     address: VAULT_ADDRESS as `0x${string}`,
     abi: vaultABI,
-    functionName: "userShares",
+    functionName: 'userShares',
     args: address ? [address] : undefined,
     query: {
       enabled: isConnected && !!address,
@@ -34,13 +54,18 @@ export function useVault() {
   const { data: totalAssets } = useReadContract({
     address: VAULT_ADDRESS as `0x${string}`,
     abi: vaultABI,
-    functionName: "totalAssets",
+    functionName: 'totalAssets',
   });
 
-  // Deposit function
+  // Deposit + approve functions
   const { writeContract: depositContract, data: depositHash, isPending: isDepositPending } = useWriteContract();
+  const { writeContract: approveContract, data: approveHash } = useWriteContract();
+
   const { isLoading: isDepositConfirming } = useWaitForTransactionReceipt({
     hash: depositHash,
+  });
+  const { isLoading: isApproveConfirming } = useWaitForTransactionReceipt({
+    hash: approveHash,
   });
 
   // Withdraw function
@@ -50,25 +75,52 @@ export function useVault() {
   });
 
   /**
-   * Deposit assets into the vault
-   * @param amount - Amount to deposit (as string, will be converted to wei)
+   * Deposit assets into the vault.
+   * Automatically sends ERC20 approve if allowance is too low.
    */
   const deposit = async (amount: string) => {
     try {
       setError(null);
       if (!amount || parseFloat(amount) <= 0) {
-        throw new Error("Amount must be greater than 0");
+        throw new Error('Amount must be greater than 0');
       }
+      if (!publicClient) {
+        throw new Error('Public client not available');
+      }
+      if (!address) {
+        throw new Error('Wallet not connected');
+      }
+
       const amountWei = parseEther(amount);
-      
+
+      // If we successfully detected the ERC20 asset, auto-manage allowance; otherwise just call deposit
+      if (assetAddress) {
+        const currentAllowance = (await publicClient.readContract({
+          address: assetAddress,
+          abi: erc20ABI,
+          functionName: 'allowance',
+          args: [address, VAULT_ADDRESS as `0x${string}`],
+        })) as bigint;
+
+        if (currentAllowance < amountWei) {
+          await approveContract({
+            address: assetAddress,
+            abi: erc20ABI,
+            functionName: 'approve',
+            args: [VAULT_ADDRESS as `0x${string}`, amountWei],
+          });
+        }
+      }
+
+      // Call vault.deposit (will revert if user hasn't approved the Vault for the asset)
       await depositContract({
         address: VAULT_ADDRESS as `0x${string}`,
         abi: vaultABI,
-        functionName: "deposit",
+        functionName: 'deposit',
         args: [amountWei],
       });
     } catch (err: any) {
-      setError(err.message || "Deposit failed");
+      setError(err?.shortMessage || err?.message || 'Deposit failed');
       throw err;
     }
   };
@@ -81,18 +133,18 @@ export function useVault() {
     try {
       setError(null);
       if (!shares || parseFloat(shares) <= 0) {
-        throw new Error("Shares must be greater than 0");
+        throw new Error('Shares must be greater than 0');
       }
       const sharesWei = parseEther(shares);
-      
+
       await withdrawContract({
         address: VAULT_ADDRESS as `0x${string}`,
         abi: vaultABI,
-        functionName: "withdraw",
+        functionName: 'withdraw',
         args: [sharesWei],
       });
     } catch (err: any) {
-      setError(err.message || "Withdraw failed");
+      setError(err?.shortMessage || err?.message || 'Withdraw failed');
       throw err;
     }
   };
@@ -103,50 +155,49 @@ export function useVault() {
    */
   const getTotalAssets = async (): Promise<bigint> => {
     if (!publicClient) {
-      throw new Error("Public client not available");
+      throw new Error('Public client not available');
     }
 
     try {
       const result = await publicClient.readContract({
         address: VAULT_ADDRESS as `0x${string}`,
         abi: vaultABI,
-        functionName: "totalAssets",
+        functionName: 'totalAssets',
       });
 
       return toBigIntSafe(result);
     } catch (err: any) {
-      setError(err.message || "Failed to get total assets");
+      setError(err?.shortMessage || err?.message || 'Failed to get total assets');
       throw err;
     }
   };
 
   /**
    * Get user shares for a specific address
-   * @param userAddress - Address to query shares for
-   * @returns Promise<bigint> - User shares as bigint
    */
   const getUserShares = async (userAddress: `0x${string}` | string): Promise<bigint> => {
     if (!publicClient) {
-      throw new Error("Public client not available");
+      throw new Error('Public client not available');
     }
 
     try {
-      const address = typeof userAddress === "string" ? (userAddress as `0x${string}`) : userAddress;
+      const addr = typeof userAddress === 'string' ? (userAddress as `0x${string}`) : userAddress;
       const result = await publicClient.readContract({
         address: VAULT_ADDRESS as `0x${string}`,
         abi: vaultABI,
-        functionName: "userShares",
-        args: [address],
+        functionName: 'userShares',
+        args: [addr],
       });
 
       return toBigIntSafe(result);
     } catch (err: any) {
-      setError(err.message || "Failed to get user shares");
+      setError(err?.shortMessage || err?.message || 'Failed to get user shares');
       throw err;
     }
   };
 
-  const isLoading = isDepositPending || isDepositConfirming || isWithdrawPending || isWithdrawConfirming;
+  const isLoading =
+    isDepositPending || isDepositConfirming || isApproveConfirming || isWithdrawPending || isWithdrawConfirming;
 
   return {
     deposit,
@@ -159,3 +210,4 @@ export function useVault() {
     error,
   };
 }
+

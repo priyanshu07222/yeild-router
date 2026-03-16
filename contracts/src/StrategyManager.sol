@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./StrategyBase.sol";
+import "./StrategyOptimizerAdapter.sol";
 
 /**
  * @title StrategyManager
@@ -10,11 +11,11 @@ import "./StrategyBase.sol";
  * @dev Only owner can modify strategies
  */
 contract StrategyManager is Ownable {
-    /// @notice Struct to store strategy information
+    /// @notice Struct to store strategy information (see README: chainId = EVM chain ID for network identity).
     struct Strategy {
         address strategy;  // Strategy contract address
         uint256 apy;       // Annual Percentage Yield in basis points
-        uint256 chainId;   // Chain ID where strategy is deployed (e.g., Moonbeam=1284, Astar=592)
+        uint256 chainId;   // EVM chain ID: network identity, frontend, RPC (e.g. Moonbeam=1284, Astar=592, HydraDX=2034)
         uint256 riskScore; // Risk score from 1 (lowest) to 10 (highest)
         bool active;       // Whether the strategy is active
     }
@@ -27,13 +28,21 @@ contract StrategyManager is Ownable {
     event APYUpdated(uint256 indexed strategyId, uint256 newAPY);
     event StrategyDeactivated(uint256 indexed strategyId);
 
-    constructor(address _owner) Ownable(_owner) {}
+    /// @notice Adapter: invokes Rust optimizer (contract or precompile) or Solidity fallback (see README).
+    StrategyOptimizerAdapter public optimizer;
+
+    /// @param _owner Owner of the strategy manager
+    /// @param _optimizer Address of the StrategyOptimizerAdapter (deployed separately, e.g. in DeployVault)
+    constructor(address _owner, address _optimizer) Ownable(_owner) {
+        require(_optimizer != address(0), "StrategyManager: invalid optimizer address");
+        optimizer = StrategyOptimizerAdapter(_optimizer);
+    }
 
     /**
      * @notice Add a new strategy
      * @param strategy Address of the strategy contract
      * @param apy Annual Percentage Yield in basis points (e.g., 500 = 5%)
-     * @param chainId Chain ID where strategy is deployed (e.g., Moonbeam=1284, Astar=592)
+     * @param chainId EVM chain ID for network identity (e.g. Moonbeam=1284, Astar=592, HydraDX=2034). See README; production XCM uses parachain IDs.
      * @param riskScore Risk score from 1 (lowest risk) to 10 (highest risk)
      */
     function addStrategy(
@@ -88,24 +97,31 @@ contract StrategyManager is Ownable {
      */
     function getBestStrategy() external view returns (address) {
         require(strategies.length > 0, "StrategyManager: no strategies available");
-        
-        int256 bestScore = type(int256).min;
-        address bestStrategy = address(0);
-        
+
+        // Build arrays for active strategies only, plus an index map back to `strategies`.
+        uint256 activeCount = 0;
         for (uint256 i = 0; i < strategies.length; i++) {
-            if (strategies[i].active) {
-                // Calculate risk-adjusted score: apy - (riskScore * 100)
-                int256 score = int256(strategies[i].apy) - int256(strategies[i].riskScore * 100);
-                
-                if (score > bestScore) {
-                    bestScore = score;
-                    bestStrategy = strategies[i].strategy;
-                }
-            }
+            if (strategies[i].active) activeCount++;
         }
-        
-        require(bestStrategy != address(0), "StrategyManager: no active strategies");
-        return bestStrategy;
+
+        require(activeCount > 0, "StrategyManager: no active strategies");
+
+        uint256[] memory apys = new uint256[](activeCount);
+        uint256[] memory risks = new uint256[](activeCount);
+        uint256[] memory indexMap = new uint256[](activeCount);
+
+        uint256 j = 0;
+        for (uint256 i = 0; i < strategies.length; i++) {
+            if (!strategies[i].active) continue;
+            apys[j] = strategies[i].apy;
+            risks[j] = strategies[i].riskScore;
+            indexMap[j] = i;
+            j++;
+        }
+
+        uint256 bestActiveIndex = optimizer.getBestStrategyIndex(apys, risks);
+        uint256 bestIndex = indexMap[bestActiveIndex];
+        return strategies[bestIndex].strategy;
     }
 
     /**
@@ -119,9 +135,9 @@ contract StrategyManager is Ownable {
     }
 
     /**
-     * @notice Get the chain ID for a given strategy address
+     * @notice Get the EVM chain ID for a given strategy address (network identity; see README).
      * @param strategy Strategy contract address
-     * @return chainId Chain ID where the strategy is deployed
+     * @return chainId EVM chain ID (e.g. 1284, 592, 2034). For XCM routing in production use parachain IDs from docs.
      */
     function getStrategyChain(address strategy) external view returns (uint256 chainId) {
         require(strategy != address(0), "StrategyManager: invalid strategy address");

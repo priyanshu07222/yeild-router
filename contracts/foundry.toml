@@ -4,6 +4,8 @@ out = "out"
 libs = ["lib"]
 test = "test"
 script = "script"
+# Avoid PUSH0 where possible. Polkadot Hub does not support PUSH0; some builds still emit it (Known Foundry/solc issue with paris).
+evm_version = "paris"
 
 remappings = [
   "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
@@ -17,5 +19,10 @@ exclude = [
   "lib/openzeppelin-contracts/fv",
   "lib/solmate/test"
 ]
+
+# Polkadot Hub TestNet: use with Foundry nightly (foundryup --version nightly)
+# RPC: https://services.polkadothub-rpc.com/testnet | Chain ID: 420420417
+[etherscan]
+polkadot-testnet = { key = "", url = "https://blockscout-testnet.polkadot.io/api?" }
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

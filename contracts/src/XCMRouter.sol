@@ -3,21 +3,21 @@ pragma solidity ^0.8.20;
 
 /**
  * @title XCMRouter
- * @notice Simulates Polkadot XCM cross-chain asset transfers between parachains
- * @dev This contract does NOT move tokens. It only emits an event to demonstrate
- *      cross-chain messaging in a DeFi yield router context.
- *
- *      In production, this would integrate with Polkadot XCM via chain-specific
- *      precompiles, pallets, or messaging endpoints to dispatch an actual XCM
- *      message and coordinate asset movements across parachains.
+ * @notice Routing layer: Vault → XCMRouter → XCM precompile (see README).
+ * @dev When xcmPrecompile is set, sendXCM calls it then emits XCMTransfer. When zero, only emits.
+ *      Payload is simplified for demonstration: abi.encode(fromChain, toChain, strategy, amount).
+ *      Real XCM messages typically include execution weight limits, fee assets, and origin context.
  */
 contract XCMRouter {
+    /// @notice XCM precompile address; when set, sendXCM forwards the call to it (see README).
+    address public immutable xcmPrecompile;
+
+    constructor(address _xcmPrecompile) {
+        xcmPrecompile = _xcmPrecompile;
+    }
+
     /**
-     * @notice Emitted when a simulated cross-chain transfer is requested
-     * @param fromChain Source parachain identifier (simulated)
-     * @param toChain Destination parachain identifier (simulated)
-     * @param strategy Strategy contract address associated with the transfer
-     * @param amount Amount being "transferred" (simulated)
+     * @notice Emitted when a cross-chain transfer is requested (simulation or after XCM precompile)
      */
     event XCMTransfer(
         uint256 indexed fromChain,
@@ -27,12 +27,8 @@ contract XCMRouter {
     );
 
     /**
-     * @notice Simulate sending an XCM message for a cross-chain transfer
-     * @dev Emits {XCMTransfer}. No tokens are moved and no message is actually dispatched.
-     * @param fromChain Source parachain identifier (simulated)
-     * @param toChain Destination parachain identifier (simulated)
-     * @param strategy Strategy contract address associated with the transfer
-     * @param amount Amount being "transferred" (simulated)
+     * @notice Send XCM: when xcmPrecompile is set, calls it; always emits XCMTransfer.
+     * @dev In this demo, fromChain/toChain are EVM chain IDs (as passed by Vault). In production, caller would pass parachain IDs for XCM routing (README). Payload simplified: abi.encode(fromChain, toChain, strategy, amount). Precompile ABI is chain-specific.
      */
     function sendXCM(
         uint256 fromChain,
@@ -42,6 +38,12 @@ contract XCMRouter {
     ) external {
         require(strategy != address(0), "XCMRouter: invalid strategy");
         require(amount > 0, "XCMRouter: amount must be greater than 0");
+
+        if (xcmPrecompile != address(0)) {
+            bytes memory payload = abi.encode(fromChain, toChain, strategy, amount);
+            (bool ok,) = xcmPrecompile.call(payload);
+            require(ok, "XCMRouter: precompile call failed");
+        }
 
         emit XCMTransfer(fromChain, toChain, strategy, amount);
     }
