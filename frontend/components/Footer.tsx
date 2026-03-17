@@ -30,7 +30,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="https://github.com"
+                  href="https://github.com/priyanshu07222/yeild-router"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[#8795B3] hover:text-white transition-colors text-sm"
