@@ -28,7 +28,7 @@ Users interact only with the **Vault on Polkadot Hub**.
 ```mermaid
 flowchart LR
   U[User] -->|deposit| V[Vault (Hub)]
-  V -->|getBestStrategy()| S[Solidity optimizer path\n(StrategyManager + Adapter)]
+  V -->|getBestStrategy()| S["Solidity optimizer path<br/>(StrategyManager + Adapter)"]
   S -->|staticcall| P[Precompile / PolkaVM optimizer]
   P -->|best chain + strategy| V
   V -->|XCM deposit| M[Moonbeam]
