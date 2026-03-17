@@ -29,8 +29,9 @@ Users interact only with the **Vault on Polkadot Hub**.
 flowchart LR
   U[User] -->|Deposit| V[Vault on Hub]
   V -->|Select best yield| O[Optimizer Solidity Adapter]
-  O -->|Call| P[Precompile PolkaVM]
-  P -->|Best route| V
+  O -->|Call| P[PolkaVM precompile]
+  P -->|Executes| R[Rust optimizer]
+  R -->|Best route| V
   V -->|XCM deposit| M[Moonbeam]
   V -->|XCM deposit| A[Astar]
   V -->|XCM deposit| H[HydraDX]
