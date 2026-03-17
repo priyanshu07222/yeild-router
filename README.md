@@ -28,8 +28,8 @@ Users interact only with the **Vault on Polkadot Hub**.
 ```mermaid
 flowchart LR
   U[User] -->|Deposit| V[Vault on Hub]
-  V -->|Select best yield| O[Optimizer (Solidity Adapter)]
-  O -->|Call| P[Precompile / PolkaVM]
+  V -->|Select best yield| O[Optimizer Solidity Adapter]
+  O -->|Call| P[Precompile PolkaVM]
   P -->|Best route| V
   V -->|XCM deposit| M[Moonbeam]
   V -->|XCM deposit| A[Astar]
